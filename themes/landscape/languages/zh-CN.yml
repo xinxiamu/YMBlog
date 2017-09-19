@@ -17,3 +17,6 @@ powered_by: Powered by
 rss_feed: RSS Feed
 category: Category
 tag: Tag
+index:
+  title: 首页
+  add: 添加
