@@ -64,7 +64,8 @@ baidusitemap:
   path: baidusitemap.xml
 
 #Local search
-local_search: true ## Use a javascript-based local search engine, true/false.
+## Use a javascript-based local search engine, true/false.
+local_search: true
 
 #Cmments
 comment:
@@ -103,8 +104,10 @@ about:
   photo_url: http://obzf7z93c.bkt.clouddn.com/themeauthor.jpg ## Your photo e.g. http://obzf7z93c.bkt.clouddn.com/themeauthor.jpg
   items:
   - label: email
-    url: ## Your email with mailto: e.g.  mailto:zhenggchaoo@gmail.com
-    title: ## Your email e.g.  zhenggchaoo@gmail.com
+    ## Your email with mailto: e.g.  mailto:zhenggchaoo@gmail.com
+    url: https://mail.qq.com
+    ## Your email e.g.  zhenggchaoo@gmail.com
+    title: 932852117@qq.com
   - label: github
     url: ## Your github'url e.g.  https://github.com/chaooo
     title: ## Your github'name e.g.  chaooo

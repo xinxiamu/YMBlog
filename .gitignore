@@ -1,3 +1,6 @@
 node_modules/
 .idea/
 YMBlog.iml
+Would skip repository .deploy_git/
+public/
+.deploy_git/

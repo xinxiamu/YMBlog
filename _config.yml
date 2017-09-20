@@ -4,8 +4,8 @@
 
 # Site
 title: 小木
-subtitle:
-description: 技术博客，
+subtitle: 乌龟快跑
+description: 技术博客
 author: xinxiamu
 language: zh-CN #开启中文
 timezone:
@@ -71,3 +71,23 @@ deploy:
   type: git
   repo: https://github.com/xinxiamu/xinxiamu.github.io.git
   branch: master
+
+# 搜索
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: true
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: false
+    tags: true
