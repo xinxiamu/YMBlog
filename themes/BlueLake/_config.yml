@@ -123,9 +123,19 @@ about:
 
 # Links widget. Empty links will hide widget.
 links:
-  - title: site-name1
-    url: http://www.example1.com/
-  - title: site-name2
-    url: http://www.example2.com/
-  - title: site-name3
-    url: http://www.example3.com/
+  - title: 程序员DD|翟永超
+    url: http://blog.didispace.com/
+  - title: spring4all
+    url: http://spring4all.com/
+  - title: 泥瓦匠的博客
+    url: http://www.bysocket.com/
+  - title: 周立|Spring Cloud
+    url: http://itmuch.com/
+  - title: 梁桂钊的博客
+    url: http://itmuch.com/
+  - title: 纯洁的微笑
+    url: http://www.ityouknow.com/
+  - title: Any-Video
+    url: http://www.ictgu.cn/
+  - title: 在线作图
+    url: https://www.processon.com/
