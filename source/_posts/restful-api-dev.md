@@ -10,6 +10,8 @@ restfull api代码风格思想，参考：
 
 - [《理解RESTful架构》](http://www.ruanyifeng.com/blog/2011/09/restful.html)
 
+- [https://restfulapi.net/resource-naming/](https://restfulapi.net/resource-naming/)
+
 ## 一. 协议
 API与用户的通信协议，总是使用HTTPs协议。
 
