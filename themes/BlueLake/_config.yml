@@ -123,19 +123,33 @@ about:
 
 # Links widget. Empty links will hide widget.
 links:
-  - title: 程序员DD|翟永超
+  - title: 程序员DD|翟永超的博客
     url: http://blog.didispace.com/
-  - title: spring4all
-    url: http://spring4all.com/
   - title: 泥瓦匠的博客
     url: http://www.bysocket.com/
-  - title: 周立|Spring Cloud
+  - title: 周立|Spring Cloud的博客
     url: http://itmuch.com/
   - title: 梁桂钊的博客
     url: http://itmuch.com/
-  - title: 纯洁的微笑
+  - title: 纯洁的微笑的博客
     url: http://www.ityouknow.com/
   - title: Any-Video
     url: http://www.ictgu.cn/
   - title: 在线作图
     url: https://www.processon.com/
+  - title: spring4all
+    url: http://spring4all.com/
+  - title: 开源中国
+    url: https://www.oschina.net/
+  - title: w3cschool学习网
+    url: https://www.w3cschool.cn/
+  - title: angular中文教程
+    url: https://angular.cn/
+  - title: java教程
+    url: http://tutorials.jenkov.com
+  - title: programcreek-java教程
+    url: https://www.programcreek.com/
+  - title: howtodoinjava
+    url: https://howtodoinjava.com/
+  - title: javadoc(8/9)
+    url: http://docs.oracle.com/javase/9/docs/api/
