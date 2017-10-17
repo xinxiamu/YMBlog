@@ -9,6 +9,8 @@ tags: git-server-build
 
 首先安装最新版本git
 
+## 创建git仓库
+
 一、创建git用户，用来管理git服务，为git设置密码
 > id git
 查看是否已经有该用户，如果没有则创建用户
