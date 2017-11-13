@@ -5,7 +5,9 @@ categories: CentOs
 tags: centos-nexus
 ---
 
-项目组件化，共用jar包，统一获取墙外jar包……
+项目组件化，共用jar包，统一获取墙外jar包…… 
+
+官方文档 [sonatype](https://www.sonatype.com/)
 
 ## 安装jdk
 参考其他文章……
@@ -82,6 +84,35 @@ pwd: admin123
 {% asset_img d.png %}
     
 ## 创建maven仓库
+
+{% asset_img e.png %}
+
+简单介绍下几种repository的类型:
+
+> - hosted，本地仓库，通常我们会部署自己的构件到这一类型的仓库。比如公司的第二方库。
+> - proxy，代理仓库，它们被用来代理远程的公共仓库，如maven中央仓库。
+> - group，仓库组，用来合并多个hosted/proxy仓库，当你的项目希望在多个repository使用资源时就不需要多次引用了，只需要引用一个group即可。
+
+这里我们选择创建本地仓库：
+{% asset_img f.png %}
+
+填写内容：
+{% asset_img g.png %}
+
+> version policy，可以选Release或Snapshot，如果仓库开放给所有人，那选Release比较好，如果公司内部或自己用，其中一个就可以。
+
+创建成功：
+{% asset_img h.png %}
+
+添加到maven-public仓库组：
+{% asset_img j.png %}
+
+## 查看仓库
+如果上传了项目，在Nexus用户界面，选择components -> xiaoming-host
+
+{% asset_img i.png %}
+
+
 
 
     
