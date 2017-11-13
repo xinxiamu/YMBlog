@@ -142,4 +142,27 @@ GID（加-g选项）或组名（加-n选项）。
 
 ## 4. 开机启动命令-chkconfig
 
+## 5. 文档操作
+### 5.1 复制文件-cp命令使用
+1. 文件到文件复制
+> 将文档a复制成b（相当于备份并改名）。
+cp -i a b
+或，
+cp a b
+
+2. 文件到目录复制
+>将文档 file1复制到dir1目录下，复制后名称仍未file1
+cp -i file1 dir1
+或，
+cp file1 dir1
+
+3. 目录到目录复制
+>将目录dir1复制到dir2目录下，复制结果目录被改名为dir2
+cp -r dir1 dir2
+将目录dir1下所有文件包括文件夹，都复制到dir2目录下
+cp -r dir1/*.* dir2
+常见错误：
+1、提示cp: omitting directory错误
+复制目录时，使用-r选项即可递归拷贝，如下：
+cp -r dir1 dir2
 
