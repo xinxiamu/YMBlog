@@ -8,6 +8,7 @@ tags: spring-cors
 [跨域资源共享 CORS 详解](http://www.ruanyifeng.com/blog/2016/04/cors.html)
 [同源策略和跨域访问](http://blog.csdn.net/shimiso/article/details/21830313)
 [详解js跨域问题](https://segmentfault.com/a/1190000000718840)
+[springboot前后端分离跨域](https://my.oschina.net/u/3677020/blog/1573162)
 
 ## 什么是跨域
 
