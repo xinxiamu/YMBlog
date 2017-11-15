@@ -8,6 +8,10 @@ tags: spring-boot-async
 在一些场景中，为了快速响应页面，把一些对数据一致性要求没那么严格的业务逻辑放到异步执行，可以有效的提交系统性能。
 在spring-boot中，通过简单的注解 `@Async` 就可以实现，非常优雅，不用再像以前自己直接new线程。下面是其使用方式：
 
+参考：
+- http://blog.csdn.net/blueheart20/article/details/44648667
+- http://blog.csdn.net/liuchuanhong1/article/details/64132520
+
 ## 1. 启用异步操作功能
 很简单，只需要在主类中添加注解`@EnableAsync` 即可。
 
