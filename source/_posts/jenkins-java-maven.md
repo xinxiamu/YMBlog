@@ -96,10 +96,56 @@ http://www.jianshu.com/p/a7d7df97fe4b
 {% asset_img 8.png %}
 
 添加成功构建后要执行的脚本：
+{% asset_img 8_1.png %}
 
-
-#### 3.6.2 发布jar到远程服务器
+#### 3.6.2 发布jar到远程服务器，并执行
  - 下载相关插件：
  {% asset_img 10.png %}
  
+- 在系统设置中添加远程服务器：
+ {% asset_img 11.png %}
 
+- 在项目中设置，选定远程服务器：
+{% asset_img 12.png %}
+
+*注意：*
+{% asset_img 13.png %}
+
+- 备份，执行远程服务器上的jar包
+
+1. 在远程服务器上设置脚本，放在目录：`server/bin`：
+
+>停止应用脚本`stop.sh`：
+    # 将应用停止
+    #stop.sh
+    #!/bin/bash
+    echo "Stopping SpringBoot Application"
+    pid=`ps -ef | grep jenkins-demo*.jar | grep -v grep | awk '{print $2}'`
+    if [ -n "$pid" ]
+    then
+       kill -9 $pid
+    fi
+---    
+> 备份应用脚本`replace.sh`:
+    #replace.sh 用于将上次构建的结果备份，然后将新的构建结果移动到合适的位置
+    #!/bin/bash
+    # 先判断文件是否存在，如果存在，则备份
+    file="/server/java/apps/jenkins-demo.jar"
+    if [ -f "$file" ]
+    then
+       mv /server/java/apps/jenkins-demo.jar /server/java/apps/backup/jenkins-demo.jar.`date +%Y%m%d%H%M%S`
+    fi
+    mv /server/java/apps/jenkins-demo*.jar /server/java/apps/jenkins-demo.jar
+---
+> 启动应用包脚本`start.sh`:
+    # startup.sh 启动项目
+    #!/bin/bash
+    echo "授予当前用户权限"
+    chmod 777 /server/java/apps/jenkins-demo.jar
+    echo "执行....."
+    java -jar /server/java/apps/jenkins-demo.jar
+    
+---
+2. 设置远程服务器执行脚本： 
+
+{% asset_img 14.png %}   
