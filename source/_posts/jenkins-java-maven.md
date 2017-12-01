@@ -98,6 +98,9 @@ http://www.jianshu.com/p/a7d7df97fe4b
 添加成功构建后要执行的脚本：
 {% asset_img 8_1.png %}
 
+> 注意脚本写法，如果是后台执行：
+    `BUILD_ID=dontKillMe nohup /usr/local/SBA/startup.sh &`
+
 #### 3.6.2 发布jar到远程服务器，并执行
  - 下载相关插件：
  {% asset_img 10.png %}
