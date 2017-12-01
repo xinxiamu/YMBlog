@@ -152,3 +152,5 @@ http://www.jianshu.com/p/a7d7df97fe4b
 2. 设置远程服务器执行脚本： 
 
 {% asset_img 14.png %}   
+
+如果是jenkins所在服务器执行后台jar，要注意，远程服务器其实可以去掉，在脚本改成后台执行就可以。
