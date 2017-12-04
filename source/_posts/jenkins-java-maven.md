@@ -147,6 +147,14 @@ http://www.jianshu.com/p/a7d7df97fe4b
     chmod 777 /server/java/apps/jenkins-demo.jar
     echo "执行....."
     java -jar /server/java/apps/jenkins-demo.jar
+   注意：启动脚本如果是放在和jenkins同一个服务器上，后台执行`nohub java -jar /server/java/apps/jenkins-demo.jar &`不起作用，所在要在jenkins上这样配置`BUILD_ID=dontKillMe nohup /usr/local/SBA/startup.sh &`  
+   如果是远程服务器，就可以改成：
+       # startup.sh 启动项目
+       #!/bin/bash
+       echo "授予当前用户权限"
+       chmod 777 /server/java/apps/jenkins-demo.jar
+       echo "执行....."
+       nohup java -jar /server/java/apps/jenkins-demo.jar > jenkins-demo.out 2>& 1 &
     
 ---
 2. 设置远程服务器执行脚本： 
@@ -154,3 +162,5 @@ http://www.jianshu.com/p/a7d7df97fe4b
 {% asset_img 14.png %}   
 
 如果是jenkins所在服务器执行后台jar，要注意，远程服务器其实可以去掉，在脚本改成后台执行就可以。
+
+{% asset_img 15.png %}   
