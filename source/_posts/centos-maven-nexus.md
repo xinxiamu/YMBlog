@@ -28,11 +28,13 @@ tags: centos-nexus
     [root@iZj6ca50pk1lwxqo14jss8Z bin]# ./nexus run
 
 如果启动成功，可以看到：
+
  > Started Sonatype Nexus OSS 3.6.0-02
 
 防火墙开启8081端口。注意还要在阿里云控制后台安全组开启端口。
 
-在浏览器访问：http://47.52.236.72:8081/，可以看到：
+在浏览器访问：http://47.52.236.72:8081/
+可以看到：
 
 {% asset_img a.png %}
 
