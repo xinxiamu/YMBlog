@@ -19,8 +19,9 @@ sudo yum install erlang
 wget http://www.rabbitmq.com/releases/rabbitmq-server/v3.6.0/rabbitmq-server-3.6.0-1.noarch.rpm
 
 （2）安装
-rpm --import https://www.rabbitmq.com/rabbitmq-signing-key-public.asc
-yum install rabbitmq-server-3.6.0-1.noarch.rpm
+
+    > rpm --import https://www.rabbitmq.com/rabbitmq-release-signing-key.asc
+    > yum install rabbitmq-server-3.6.0-1.noarch.rpm
 
 （3）启用web管理插件
 rabbitmq-plugins enable rabbitmq_management
