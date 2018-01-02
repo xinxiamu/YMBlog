@@ -38,4 +38,13 @@ AuthorizedKeysFile  .ssh/authorized_keys
 重启ssh： service sshd restart   
 然后客户先先执行：ssh -v user@host (-v 调试模式)会显示一些登陆信息.若登陆失败,或者仍然要输入密码,可以在服务器查看日志文件:/var/log/secure.若登陆成功,则以后就可以用’ssh user@host’ 直接登陆了,不用输入密码.
 
+-----------------------------------------------------------
+## 更简单方式
 
+1、执行命令：ssh-keygen -t rsa -C "xx@qq.com"(随便编个字符串，一般用邮箱）
+2、之后一路回车就行啦；会在～（home）目录下中产生.ssh（隐藏）文件夹；
+3、里面有两个文件id_rsa(私钥)、id_rsa.pub(公钥)文件
+
+
+
+yutao@localhost ~]$ ssh-copy-id yutao@192.168.161.132 #把秘钥拷贝到远程服务器
