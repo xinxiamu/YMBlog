@@ -1,9 +1,13 @@
 ---
-title: centos下rabbitmq快速安装
+title: rabbitmq快速安装
 date: 2018-01-02 16:02:01
-categories: CentOs
-tags: centos-rabbitmq-install
+categories: rabbitmq
+tags: rabbitmq-install
 ---
+
+本文介绍rabbitmq在各系统平台下的安装……
+
+## 在Centos下的快速安装
 
 一、安装erlang
 sudo yum install erlang
@@ -37,3 +41,31 @@ service rabbitmq-server start
 
 五、打开网页
 http://119.23.78.160:15672/
+
+## 在Ubuntu下的快速安装
+
+安装最新版，参考网址： 
+http://www.rabbitmq.com/install-debian.html
+
+注：下面安装的不是最新版本。
+一. 安装对应erlang版本：
+erlang-nox (>= 1:19.3-1) | esl-erlang (>= 1:19.3-1).
+`sudo apt-get install erlang-nox`
+
+二. 安装rabbitMq:
+
+    $ sudo apt-get update
+    $ sudo apt-get install rabbitmq-server
+    
+三. 启用web管理插件：
+
+`sudo rabbitmq-plugins enable rabbitmq_management`  
+
+四. 访问
+打开：http://localhost:15672  
+
+五. 登录（本机）：
+用户：guest
+密码：guest
+
+注：guest用户是系统用户，默认是不允许远程登录的。如果是在服务器端安装，需要添加用户才能远程登录。
