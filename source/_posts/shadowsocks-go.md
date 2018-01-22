@@ -15,6 +15,9 @@ tags: shadowsocks-go
 
 ## 服务端
 
+编译好执行文件：{% asset_link server.tar.gz Shadowsocks-server %}  
+放到服务器，更改.json文件配置，解压直接执行.sh文件即可。
+
 1. 首先，买个国外的服务器再说吧……
    
 2. 在服务器安装golang环境。
@@ -73,6 +76,10 @@ tags: shadowsocks-go
 ---
 
 ## 客户端
+
+### linux系统
+编译好执行文件：{% asset_link client.tar.gz Shadowsocks-client %} 
+在linux客户端解压，修改.json配置文件中相关参数，启动即可。
 
 ### windows系统
 直接下载客户端。[网址](https://github.com/shadowsocks/shadowsocks-windows)
