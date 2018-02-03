@@ -149,6 +149,8 @@ links:
     url: https://angular.cn/
   - title: java教程
     url: http://tutorials.jenkov.com
+  - title : javasampleapproach-java教程
+    url: http://javasampleapproach.com/
   - title: programcreek-java教程
     url: https://www.programcreek.com/
   - title: howtodoinjava
@@ -157,3 +159,5 @@ links:
     url: http://docs.oracle.com/javase/9/docs/api/
   - title: eugenp/tutorials
     url: https://github.com/eugenp/tutorials
+  - title: markdown参考
+    url: http://www.markdown.cn/
