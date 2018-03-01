@@ -259,13 +259,56 @@ Docker	Hub	公共注册服务器中的仓库)。
 
 
 在浏览器查看：http://localhost:81/
+
+停止容器：`sudo docker kill --signal=SIGINT web2`
     
 至此,我们第一次完成了定制镜像,使用的是`docker	commit`命令,手动操作给旧的镜像添加了新的一层,形成新的镜像,对镜像多层存储应该有了更直观的感觉。
 
 > 注意：通常不会使用`docker commit`来创建镜像，这样容易导致镜像臃肿。另外也无法知道每次更改，变成黑箱操作。
 
 ## 使用Dockerfile定制镜像
+从上面commit我们知道，镜像是一层层定制，为了把整个定制层次透明，于是我们用脚本命令方式，把整个层次透明化，同时减少创建臃肿的镜像。而这个脚本文件，就是Dockerfile。
 
+Dockerfile是一个文本文件,其内包含了一条条的指令(Instruction),每一条指令构建一层,
+因此每一条指令的内容,就是描述该层应当如何构建。
 
+- 简单例子：
 
+1.创建Dockerfile文件
 
+    mutian@mutian-ThinkPad-T440p:~$ mkdir mynginx
+    mutian@mutian-ThinkPad-T440p:~$ cd mynginx/
+    mutian@mutian-ThinkPad-T440p:~/mynginx$ touch Dockerfile
+
+2.打开Dockerfile文件，编辑如下内容：
+    
+    FROM nginx
+    RUN echo '<h1>您好，我是Nginx！</h1>' > /usr/share/nginx/html/index.html
+
+3.构建镜像
+进入Dockerfile所在目录，执行命令：
+    
+    mutian@mutian-ThinkPad-T440p:~/mynginx$ sudo docker build -t nginx:v3 .
+    Sending build context to Docker daemon  2.048kB
+    Step 1/2 : FROM nginx
+     ---> e548f1a579cf
+    Step 2/2 : RUN echo '<h1>您好，我是Nginx！</h1>' > /usr/share/nginx/html/index.html
+     ---> Running in d8c0149adf7e
+    Removing intermediate container d8c0149adf7e
+     ---> b92f375b41f0
+    Successfully built b92f375b41f0
+    Successfully tagged nginx:v3
+
+4.查看
+    
+    mutian@mutian-ThinkPad-T440p:~/mynginx$ sudo docker image ls
+    REPOSITORY          TAG                 IMAGE ID            CREATED              SIZE
+    nginx               v3                  b92f375b41f0        About a minute ago   109MB
+    nginx               v2                  e8023c09eed5        17 hours ago         109MB
+    nginx               latest              e548f1a579cf        8 days ago           109MB
+    centos              latest              ff426288ea90        7 weeks ago          207MB
+    hello-world         latest              f2a91732366c        3 months ago    
+    
+我们看到，TAG为v3的镜像就是我们刚才构建。    
+
+- FROM指定基础镜像
