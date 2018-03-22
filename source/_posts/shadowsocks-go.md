@@ -115,6 +115,15 @@ tags: shadowsocks-go
 - qt5客户端：
 [安装网址](https://github.com/shadowsocks/shadowsocks-qt5/wiki/%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97)  
 
+### 移动
+
+- 安卓客户端：
+
+下载：{%asset_link Shadowsocks_v4.2.5_apkpure.com.apk Shadowsocks_v4.2.5_apkpure.com.apk%}
+
+- 苹果客户端：
+
+安装app：FirstWingy
 
 ### 修改浏览器代理
 > SOCKS5 127.0.0.1:local_port
@@ -123,5 +132,7 @@ tags: shadowsocks-go
 {% asset_img b.png %}
 
 然后启动，试下访问：[google](https://www.google.com)
+
+
 
 

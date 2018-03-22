@@ -7,5 +7,7 @@ tags: vagrant-start
 
 告别“在我的机子上运行没问题的……”
 
+官网网址：https://www.vagrantup.com/
+
 ## vagrant安装
 
