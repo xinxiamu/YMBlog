@@ -113,7 +113,22 @@ tags: shadowsocks-go
 启动：类似服务端，用`-c`指定配置文件。    
 
 - qt5客户端：
-[安装网址](https://github.com/shadowsocks/shadowsocks-qt5/wiki/%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97)  
+
+1. 二进制包安装。[安装网址](https://github.com/shadowsocks/shadowsocks-qt5/wiki/%E5%AE%89%E8%A3%85%E6%8C%87%E5%8D%97)  
+
+2. 推荐，命令安装：
+    
+        #Ubuntu 14.04及更高版本
+        #添加ppa源
+        sudo add-apt-repository ppa:hzwhuang/ss-qt5
+        sudo apt-get update
+        sudo apt-get install shadowsocks-qt5
+         
+        #启动shadowsocks-qt5
+        
+        可以通过which shadowsocks-qt5找到可执行文件的位置。
+        
+        执行 ./shadowsocks-qt5(桌面板，可以通过搜索已安装的shadowsocks-qt5，点击图标启动) 
 
 ### 移动
 
