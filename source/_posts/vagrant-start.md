@@ -11,3 +11,8 @@ tags: vagrant-start
 
 ## vagrant安装
 
+
+
+## 学习资源
+
+- http://www.imooc.com/learn/805

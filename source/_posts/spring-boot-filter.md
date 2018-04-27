@@ -1,5 +1,5 @@
 ---
-title: spring-boot配置过滤器
+title: spring-boot过滤器篇
 date: 2018-04-26 14:40:54
 categories: spring-boot
 tags: spring-boot-filter
@@ -124,8 +124,6 @@ tags: spring-boot-filter
 
 在spring-boot中通过注解`@Order`来标识。这个order的默认值是Integer.MAX_VALUE 也就是int的最大值。多个过滤器会按照order属性的大小从小到大执行。
 
-两种方式：
-
 1.代码设置
 
     package com.ymu.servicecommon.config;
@@ -164,47 +162,6 @@ tags: spring-boot-filter
         }
     
     }
-
-    
-2.注解方式
-    
-    package com.ymu.servicecommon.config;
-    
-    import com.ymu.servicecommon.filter.Test2Filter;
-    import com.ymu.servicecommon.filter.TestFilter;
-    import org.springframework.boot.web.servlet.FilterRegistrationBean;
-    import org.springframework.context.annotation.Bean;
-    import org.springframework.context.annotation.Configuration;
-    import org.springframework.core.annotation.Order;
-    
-    @Configuration
-    public class MainConfig {
-    
-        /**
-         * 配置过滤器
-         * @return
-         */
-        @Bean
-        @Order(Integer.MAX_VALUE -2)
-        public FilterRegistrationBean testFilterRegistration() {
-            FilterRegistrationBean registration = new FilterRegistrationBean(new TestFilter());
-            registration.addUrlPatterns("/*");
-    //        registration.addInitParameter("abc", "abc-value");
-            registration.setName("testFilter");
-            return registration;
-        }
-    
-        @Bean
-        @Order(Integer.MAX_VALUE -1)
-        public FilterRegistrationBean test2FilterRegistration() {
-            FilterRegistrationBean registration = new FilterRegistrationBean(new Test2Filter());
-            registration.addUrlPatterns("/*");
-    //        registration.addInitParameter("abc", "abc-value");
-            registration.setName("test2Filter");
-            return registration;
-        }
-    
-    }
     
 ----------------------------------------------------    
 
@@ -215,3 +172,70 @@ tags: spring-boot-filter
 - 请求接口，观察执行顺序。
 
 {% asset_img b.png %}
+
+
+## 在过滤器中为请求添加http请求头信息
+
+1.定义类ModifyHttpServletRequestWrapper.java
+
+    package com.ymu.framework.web;
+    
+    import javax.servlet.http.HttpServletRequest;
+    import javax.servlet.http.HttpServletRequestWrapper;
+    import java.util.*;
+    
+    public class ModifyHttpServletRequestWrapper extends HttpServletRequestWrapper {
+     
+        private Map<String, String> customHeaders;
+     
+        public ModifyHttpServletRequestWrapper(HttpServletRequest request) {
+            super(request);
+            this.customHeaders = new HashMap<>();
+        }
+     
+        public void putHeader(String name, String value) {
+            this.customHeaders.put(name, value);
+        }
+     
+        public String getHeader(String name) {
+            String value = this.customHeaders.get(name);
+            if (value != null) {
+                return value;
+            }
+            return ((HttpServletRequest) getRequest()).getHeader(name);
+        }
+     
+        public Enumeration<String> getHeaderNames() {
+            Set<String> set = new HashSet<>(customHeaders.keySet());
+            Enumeration<String> enumeration = ((HttpServletRequest) getRequest()).getHeaderNames();
+            while (enumeration.hasMoreElements()) {
+                String name = enumeration.nextElement();
+                set.add(name);
+            }
+            return Collections.enumeration(set);
+        }
+     
+    }
+    
+2.定义过滤器，编辑
+    
+    @Override
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        logger.debug(">>>>indexFilter doFilter");
+
+        //添加或者更改header信息
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        String apiVersion = request.getHeader("Content-Version");
+        if (null == apiVersion || "".equals(apiVersion)) {
+            ModifyHttpServletRequestWrapper requestWrapper = new ModifyHttpServletRequestWrapper(request);
+            requestWrapper.putHeader("Content-Version","-1");
+            filterChain.doFilter(requestWrapper,servletResponse);
+        } else {
+            filterChain.doFilter(request,servletResponse);
+        }
+    }   
+
+    重点代码：
+    ModifyHttpServletRequestWrapper requestWrapper = new ModifyHttpServletRequestWrapper(request);
+    requestWrapper.putHeader("Content-Version","-1");
+    filterChain.doFilter(requestWrapper,servletResponse);
