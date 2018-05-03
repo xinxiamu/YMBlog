@@ -94,6 +94,10 @@ base_path=/server/data/fdfs/tracker
 检查启动是否成功：
     `ps -ef | grep fdfs_storaged `  
     
+停止:
+
+    `/usr/bin/fdfs_trackerd /etc/fdfs/tracker.conf stop`    
+    
 设置storage服务开机启动  
 
 停止：
