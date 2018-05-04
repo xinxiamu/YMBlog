@@ -121,4 +121,6 @@ http://cloud.spring.io/spring-cloud-static/Edgware.SR3/multi/multi__spring_cloud
         "sex": 0
     }
     
-         
+## 对特殊字符加密问题
+
+参考：http://blog.didispace.com/spring-cloud-config-sp-char-encrypt/         
