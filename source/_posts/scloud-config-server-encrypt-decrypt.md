@@ -123,4 +123,4 @@ http://cloud.spring.io/spring-cloud-static/Edgware.SR3/multi/multi__spring_cloud
     
 ## 对特殊字符加密问题
 
-参考：http://blog.didispace.com/spring-cloud-config-sp-char-encrypt/         
+参考：http://blog.didispace.com/spring-cloud-config-sp-char-encryp         
