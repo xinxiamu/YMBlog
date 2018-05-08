@@ -45,3 +45,44 @@ tags: spring-boot使用经验
     
     # 指定生成表名的存储引擎为InneoDB
     spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5InnoDBDialect
+
+## 启动类配置
+
+1.让一个类型不被ComponentScan扫描
+
+    @ComponentScan(excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION,
+            value = {ExcludeComponent.class})) //添加了@ExcludeComponent注解的类将不会被ComponentScan扫描
+    public class ServiceFileclientApplication {
+    
+        public static void main(String[] args) {
+            SpringApplication.run(ServiceFileclientApplication.class, args);
+        }
+    }
+    
+    ----
+    
+    package com.ymu.servicefileclient.config;
+    
+    public @interface ExcludeComponent {
+    }
+    
+    -------
+    /**
+     * 该类为Feign的配置类
+     * 注意：该类不应该在主应用程序上下文的@CompantScan中
+     */
+    @ExcludeComponent
+    @Configuration
+    public class FeignConfiguration {
+    
+        /**
+         * 用feign.Contract.Default替换SpringMvcContract契约
+         *
+         * @return
+         */
+        @Bean
+        public Contract feignContract() {
+            return new feign.Contract.Default();
+        }
+    
+    }
