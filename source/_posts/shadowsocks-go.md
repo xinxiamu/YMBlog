@@ -150,4 +150,49 @@ tags: shadowsocks-go
 
 
 
+### linux下全局代理
 
+实验环境：Ubuntu系统
+
+1.安装应用`privoxy`
+
+一款工具，将socks代理转换成http。
+
+`sudo apt-get install privoxy`
+
+2.更改配置
+
+    sudo gedit /etc/privoxy/config
+    
+    ----------------------------------------------------------------
+
+    # 在 froward-socks4下面添加一条socks5的，因为shadowsocks为socks5，
+    # 地址是127.0.0.1:1080。注意他们最后有一个“.”
+    #        forward-socks4   /               socks-gw.example.com:1080  .
+    forward-socks5   /               127.0.0.1:1080 .
+    
+    # 下面还存在以下一条配置，表示privoxy监听本机8118端口，
+    # 把它作为http代理，代理地址为 http://localhost.8118/ 。
+    # 可以把地址改为 0.0.0.0:8118，表示外网也可以通过本机IP作http代理。
+    # 这样，你的外网IP为1.2.3.4，别人就可以设置 http://1.2.3.4:8118/ 为http代理。
+    　listen-address localhost:8118  #端口可以随意设定
+
+3.重启privoxy
+
+    sudo systemctl restart privoxy.serivce
+    
+4.添加环境变量
+
+    vim ~/.bashrc
+    
+    ----
+    添加两行：
+    export http_proxy=http://127.0.0.1:8118/
+    export https_proxy=http://127.0.0.1:8118/  
+    
+5.使环境变量立即生效
+
+    source ~/.bashrc
+    
+说明：如果只是想临时的让当前命令窗口代理，那么只需要添加临时变量，不需要编辑~/.bashrc。  
+只需要在当前命令窗口执行`export http_proxy=http://127.0.0.1:8118/` ` export https_proxy=http://127.0.0.1:8118/ `         
