@@ -86,3 +86,32 @@ tags: spring-boot使用经验
         }
     
     }
+
+## 文件相关
+
+1.在jar包所在目录下创建文件或者文件夹
+
+     //jar所在文件目录
+     @Value("${user.dir}")
+     private String userDir;
+     
+     //创建文件夹abc
+      URI uri = URI.create(userDir);
+      File file = new File(uri + "/abc");
+      if (!file.exists()) {
+          file.mkdir();
+      }
+
+2.系统用户根目录下创建文件
+
+     // 桌面路径
+    FileSystemView fsv = FileSystemView.getFileSystemView();
+    File com = fsv.getHomeDirectory();
+    // String url = com.getPath().replaceAll("\\\\", "\\\\\\\\") + "\\";
+    String filePath = com.getPath();
+    String fileName = "导出数据.pdf";
+    String uri = filePath.concat(File.separator).concat(fileName);   
+   
+3.获取类所在资源目录
+
+    this.getClass().getClassLoader().getResource("").getPath();      
