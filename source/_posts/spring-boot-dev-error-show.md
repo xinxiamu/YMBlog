@@ -91,7 +91,7 @@ tags: spring-boot使用经验
 
 1.在jar包所在目录下创建文件或者文件夹
 
-     //jar所在文件目录
+     //运行jar所在文件目录
      @Value("${user.dir}")
      private String userDir;
      
@@ -114,4 +114,14 @@ tags: spring-boot使用经验
    
 3.获取类所在资源目录
 
-    this.getClass().getClassLoader().getResource("").getPath();      
+    this.getClass().getClassLoader().getResource("").getPath(); 
+    
+    --------------------------------------x
+    
+    近期在用springboot封装一些对外服务的API接口，在本机测试都很顺利，可是当我打包jar文件放到服务器上测试的时候发现了类似下面的异常信息：
+    
+    java.nio.file.NoSuchFileException: file:/app.jar!/BOOT-INF/classes!/xxx.properties 
+     
+    于是网上一番搜索，找到类似的解决方法：
+    Properties prop = new Properties();
+    InputStream is = this.getClass().getResourceAsStream(filePath);     
