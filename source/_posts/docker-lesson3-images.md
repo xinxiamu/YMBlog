@@ -272,7 +272,7 @@ Docker	Hub	公共注册服务器中的仓库)。
 Dockerfile是一个文本文件,其内包含了一条条的指令(Instruction),每一条指令构建一层,
 因此每一条指令的内容,就是描述该层应当如何构建。
 
-- 简单例子：
+### 简单例子：
 
 1.创建Dockerfile文件
 
@@ -311,4 +311,99 @@ Dockerfile是一个文本文件,其内包含了一条条的指令(Instruction),�
     
 我们看到，TAG为v3的镜像就是我们刚才构建。    
 
-- FROM指定基础镜像
+### FROM指定基础镜像
+
+定制镜像必须是以一个镜像为基础来构建，基础镜像是必须要指定的，而FROM命令就是指定基础镜像，且第一步就要指定。   
+
+除了选择一些先前定制好的镜像作为基础镜像，Docker还存在一个特殊的镜像，名为`scratch`，表示空镜像，是个虚拟的概念，不实际存在。
+
+    FROM	scratch
+    ...
+    
+如果以`scratch`为基础，则意味着不以任何镜像为基础，后面所写的命令将作为镜像的第一层存在。
+
+对于一些二进制的可执行文件，直接最为第一层存在，不依赖其它运行时系统支持，可以用空镜像。类似go语言编译的程序。
+
+### RUN 执行命令
+
+RUN命令是用来执行命令行命令的，就像shell脚本一样，用来执行linux命令。
+
+注意避免错误：
+
+    FROM	debian:jessie
+    RUN	apt-get	update
+    RUN	apt-get	install	-y	gcc	libc6-dev	make
+    RUN	wget	-O	redis.tar.gz	"http://download.redis.io/releases/redis-3.2.5.tar.gz"
+    RUN	mkdir	-p	/usr/src/redis
+    RUN	tar	-xzf	redis.tar.gz	-C	/usr/src/redis	--strip-components=1
+    RUN	make	-C	/usr/src/redis
+    RUN	make	-C	/usr/src/redis	install
+    
+每一个指令都会创建一层，每层都会带有上层垃圾，因此一定要避免这样写。正确的写法如下： 
+
+    FROM	debian:jessie
+    RUN	buildDeps='gcc	libc6-dev	make'	\
+    				&&	apt-get	update	\
+    				&&	apt-get	install	-y	$buildDeps	\
+    				&&	wget	-O	redis.tar.gz	"http://download.redis.io/releases/redis-3.2.5.tar.gz"	\
+    				&&	mkdir	-p	/usr/src/redis	\
+    				&&	tar	-xzf	redis.tar.gz	-C	/usr/src/redis	--strip-components=1	\
+    				&&	make	-C	/usr/src/redis	\
+    				&&	make	-C	/usr/src/redis	install	\
+    				&&	rm	-rf	/var/lib/apt/lists/*	\
+    				&&	rm	redis.tar.gz	\
+    				&&	rm	-r	/usr/src/redis	\
+    				&&	apt-get	purge	-y	--auto-remove	$buildDeps
+    				
+用了`&&`，这和`shell`执行命令一样，就相当一个命令，所以算一层。执行完后，一定要记得删除不必要的垃圾数据，垃圾包。  
+在编写`Dockerfile`时候，一定要面向类似事件的思维，比如，安装redis环境，是一个事件，算一层。安装mysql，算一个事件，一层。  
+
+## Dockerfile指令详解 
+
+上面我们已经了解了`From`、`RUN`指令，下面我们来介绍其余的……
+
+### COPY复制文件
+
+格式：
+
+- `COPY	<源路径>...	<目标路径>`
+
+- `COPY	["<源路径1>",...	"<目标路径>"]`
+
+源路径指当前电脑系统文件路径，目标路径指容器的文件路径。  
+
+`COPY`指令将从构建上下文目录中<源路径>的文件/目录复制到新的一层的镜像内的<目标路
+径>位置。比如:  
+
+    COPY	package.json	/usr/src/app/
+    
+`<源路径>`可以是多个，甚至可以是通配符，只要满足`GO`的[filepath.Match](https://golang.org/pkg/path/filepath/#Match)规则，如： 
+
+    COPY	hom*	/mydir/
+    COPY	hom?.txt	/mydir/
+    
+`<目标路径>` 可以是容器内的绝对路径，也可以是相对于工作目录的相对路径（工作目录可以用WORKDIR指令来指定）       
+
+_注意一点_： 
+
+使用	`COPY`指令,源文件的各种元数据都会保留。比如读、写、执行权限、文件变更时间等。
+   		
+
+### ADD	更高级的复制文件   
+
+`ADD`指令和`COPY`指令本质上是一样的，只是添加了更多功能。 它的源文件可以是个url，也可以是tar，如果是tar还可以自动解压。  
+
+但是，如果是url，下载下来后，还要新建一层解压，授权，因此不如用`COPY` ，然后用`wget`命令。  
+
+在某个场景下，自动解压缩功能非常有用。 如： 
+
+    FROM	scratch
+    ADD	ubuntu-xenial-core-cloudimg-amd64-root.tar.gz	/
+    ...
+    
+_注意_：  
+
+在`COPY`	和`ADD`指令中选择的时候,可以遵循这样的原则,所有的文件复制均使用COPY指令,仅在需要自动解压缩的场合使用ADD。 
+
+    
+				       
