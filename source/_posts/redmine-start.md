@@ -29,8 +29,8 @@ tags: 羡慕管理系统
 1.下载地址：http://ftp.ruby-lang.org/pub/ruby/   
     
     //下载
-    zmt@zmt-Lenovo:~/Desktop/work/tools$ wget http://ftp.ruby-lang.org/pub/ruby/2.3/ruby-2.3.1.tar.gz
-    zmt@zmt-Lenovo:~/Desktop/work/tools$ tar -zxvf ruby-2.3.1.tar.gz 
+    zmt@zmt-Lenovo:~/Desktop/work/tools$ wget http://ftp.ruby-lang.org/pub/ruby/2.4/ruby-2.4.4.tar.gz
+    zmt@zmt-Lenovo:~/Desktop/work/tools$ tar -zxvf ruby-2.4.4.tar.gz 
     
     //查询openssl安装路径
     zmt@zmt-Lenovo:~$ openssl version -a
@@ -44,7 +44,7 @@ tags: 羡慕管理系统
     //看上面结果，确定openssl安装dir为：/usr/lib/ssl
     
     //安装：
-    $ cd ruby-2.3.1
+    $ cd ruby-2.4.4
     $ ./configure  --with-openssl-dir=/usr/lib/ssl
     $ make
     $ sudo make install
@@ -53,7 +53,7 @@ tags: 羡慕管理系统
 3.检查是否安装成功：    
     
     zmt@zmt-Lenovo:~$ ruby -v
-    ruby 2.3.1p112 (2016-04-26 revision 54768) [x86_64-linux]
+    ruby 2.4.4p296 (2018-03-28 revision 63013) [x86_64-linux]
 
 看到上面显示说明安装成功。
 
@@ -108,7 +108,7 @@ Redmine uses [Bundler](http://gembundler.com/) to manage gems dependencies.
 
 1.首先按照Bundler
 
-    gem install bundler
+    sudo gem install bundler
     
 报错误：
 
@@ -128,26 +128,34 @@ Redmine uses [Bundler](http://gembundler.com/) to manage gems dependencies.
 
 _注：_  没关系，我们不通过网络安装，而是直接下载gem安装包安装。
 
-2.安装RubyGems安装
 
-如果第一步能执行成功，不需要另外安装rubygems，因为安装ruby的时候已经安装。 
-
-网址：https://rubygems.org/
-
-下载并安装：
-
-    # wget https://rubygems.global.ssl.fastly.net/rubygems/rubygems-2.6.6.tgz
-    # tar zxvf rubygems-2.6.6.tgz
-    # cd rubygems-2.6.6.tgz
-    # ruby setup.rb
+    安装RubyGems安装
     
-    //显示版本好，说民安装成功
-    zmt@zmt-Lenovo:~/Desktop/work/tools/rubygems-2.6.6$ gem -v
-    2.6.6
-                  
-安装成功，重新执行步骤1，即安装Bundler，执行：
-
-    gem install bundler
+    如果第一步能执行成功，不需要另外安装rubygems，因为安装ruby的时候已经安装。 
+    
+    网址：https://rubygems.org/
+    
+    下载并安装：
+    
+        # wget https://rubygems.global.ssl.fastly.net/rubygems/rubygems-2.6.6.tgz
+        # tar zxvf rubygems-2.6.6.tgz
+        # cd rubygems-2.6.6.tgz
+        # ruby setup.rb
+        
+        //显示版本好，说民安装成功
+        zmt@zmt-Lenovo:~/Desktop/work/tools/rubygems-2.6.6$ gem -v
+        2.6.6
+                      
+    安装成功，重新执行步骤1，即安装Bundler，执行：
+    
+        gem install bundler
 
  
-       
+2.然后可以利用bundler安装redmine相关依赖包
+
+Then you can install all the gems required by Redmine using the following command:
+
+    bundle install --without development test
+    
+    
+           
