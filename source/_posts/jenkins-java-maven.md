@@ -164,3 +164,12 @@ http://www.jianshu.com/p/a7d7df97fe4b
 如果是jenkins所在服务器执行后台jar，要注意，远程服务器其实可以去掉，在脚本改成后台执行就可以。
 
 {% asset_img 15.png %}   
+
+## 备注：
+
+1.替换jar包中的文件
+
+`jar -uvf rpds.jar BOOT-INF/classes/db.properties `
+
+
+
