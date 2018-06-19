@@ -9,4 +9,4 @@ html转pdf工具wkhtmltopdf的使用记录……
 
 ## centos下安装环境
 
-1.依赖包安装： `yum install libX11 libXext libXrender` 
+1.依赖包安装： `yum install zlib fontconfig freetype libX11 libXext libXrender` 
