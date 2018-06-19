@@ -405,5 +405,182 @@ _注意_：
 
 在`COPY`	和`ADD`指令中选择的时候,可以遵循这样的原则,所有的文件复制均使用COPY指令,仅在需要自动解压缩的场合使用ADD。 
 
+### CMD容器启动命令
+
+也有两种格式：
+
+- `shell`格式：`CMD <命令>`
+- `exec`格式：`CMD	["可执行文件",	"参数1",	"参数2"...]`    
+- 参数列表格式: 	`CMD	["参数1",	"参数2"...]`	 。在指定了`ENTRYPOINT`指令后,用`CMD`指定具体的参数。
+
+在指令格式上，推荐`exec`格式。  
+
+Docker不是虚拟机，只是一个进程。因此，在容器中启动程序，不要以后台形式启动，要以前台形式启动。   
+容器内没有后台概念。 
+
+不要这样启动：
+
+`CMD service ginx start`
+
+直接启动可执行文件，并以前台形式启动：
+
+`CMD ["nginx","-g","daemon off;"]`
+
+### ENTRYPOINT入口点
+
+也分为：`exec`格式和`shell`格式
+
+当指定了`ENTRYPOINT`后，就会把`CMD`的内容作为参数传给`ENTRYPOINT	`指令，换句话说实际执行时，将变为：
+
+    <ENTRYPOINT>	"<CMD>"
+
+_场景一_：
+把镜像当成命令一样使用。
+
+    FROM	ubuntu:16.04
+    RUN	apt-get	update	\
+    				&&	apt-get	install	-y	curl	\
+    				&&	rm	-rf	/var/lib/apt/lists/*
+    CMD	[	"curl",	"-s",	"http://ip.cn"	]
     
+执行：
+
+    $	docker	run	myip
+    当前	IP:61.148.226.66	来自:北京市	联通    
+
+再执行：
+    
+    $	docker	run	myip	-i
+    docker:	Error	response	from	daemon:	invalid	header	field	value	"oci	runtime	error:	con
+    tainer_linux.go:247:	starting	container	process	caused	\"exec:	\\\"-i\\\":	executable	
+    file	not	found	in	$PATH\"\n".
+
+可以看到，报错了，因为`-i`不能参数不能传到`CMD`上去。
+
+正确方式：
+
+    FROM	ubuntu:16.04
+    RUN	apt-get	update	\
+    				&&	apt-get	install	-y	curl	\
+    				&&	rm	-rf	/var/lib/apt/lists/*
+    ENTRYPOINT	[	"curl",	"-s",	"http://ip.cn"	]
+    
+执行：
+
+    $	docker	run	myip
+    当前	IP:61.148.226.66	来自:北京市	联通
+    
+    $	docker	run	myip	-i
+    HTTP/1.1	200	OK
+    Server:	nginx/1.8.0
+    Date:	Tue,	22	Nov	2016	05:12:40	GMT
+    Content-Type:	text/html;	charset=UTF-8
+    Vary:	Accept-Encoding
+    X-Powered-By:	PHP/5.6.24-1~dotdeb+7.1
+    X-Cache:	MISS	from	cache-2
+    X-Cache-Lookup:	MISS	from	cache-2:80
+    X-Cache:	MISS	from	proxy-2_6
+    Transfer-Encoding:	chunked
+    Via:	1.1	cache-2:80,	1.1	proxy-2_6:8006
+    Connection:	keep-alive
+    当前	IP:61.148.226.66	来自:北京市	联通
+    
+可以看到,这次成功了。这是因为当存在`ENTRYPOINT`后,`CMD`的内容将会作为参数传给`ENTRYPOINT`,而这里`-i`就是新的`CMD`,因此会作为参数传给`curl`,从而达到了我们预`期的效果。      
+
+_场景二_：
+
+在应用程序启动前等做一些初始化工作。 
+
+比如启动redis，不以`root`，而以`redis`用户身份启动。 
+
+    FROM	alpine:3.4
+    ...
+    RUN	addgroup	-S	redis	&&	adduser	-S	-G	redis	redis
+    ...
+    ENTRYPOINT	["docker-entrypoint.sh"]
+    EXPOSE	6379
+    CMD	[	"redis-server"	]
+    
+可以看到其中为了`redis`服务创建了`redis	`用户,并在最后指定了`ENTRYPOINT`为`docker-entrypoint.sh`脚本。   
+
+    #!/bin/sh
+    ...
+    #	allow	the	container	to	be	started	with	`--user`
+    if	[	"$1"	=	'redis-server'	-a	"$(id	-u)"	=	'0'	];	then
+    				chown	-R	redis	.
+    				exec	su-exec	redis	"$0"	"$@"
+    fi
+    exec	"$@"
+    
+执行：
+
+    $	docker	run	-it	redis	id
+    uid=0(root)	gid=0(root)	groups=0(root)
+    
+### ENV	设置环境变量
+
+格式有两种:
+
+- `ENV	<key>	<value>	`    
+- `	ENV	<key1>=<value1>	<key2>=<value2>...`  
+
+如：
+    
+    ENV	VERSION=1.0	DEBUG=on \
+    	NAME="Happy	Feet"   
+    	
+这里展示了用法，还展示了换行，有空格的话用双引号。 
+
+定义了变量，后面的命令中就可以使用了。可以使用它的命令如下一些： 
+
+    ADD	 、 	COPY	 、 	ENV	 、 	EXPOSE	 、 	LABEL	 、 	USER	 、 	WORKDIR	 、 	VOLUME	 、 	STOPSIGNAL	 、 	ONBU
+    ILD	
+    
+node官方Dockerfile例子：
+
+    ENV	NODE_VERSION	7.2.0
+    RUN	curl	-SLO	"https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.ta
+    r.xz"	\
+    		&&	curl	-SLO	"https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc"	\
+    		&&	gpg	--batch	--decrypt	--output	SHASUMS256.txt	SHASUMS256.txt.asc	\
+    		&&	grep	"	node-v$NODE_VERSION-linux-x64.tar.xz\$"	SHASUMS256.txt	|	sha256sum	-c	-	\
+    		&&	tar	-xJf	"node-v$NODE_VERSION-linux-x64.tar.xz"	-C	/usr/local	--strip-components=
+    1	\
+    		&&	rm	"node-v$NODE_VERSION-linux-x64.tar.xz"	SHASUMS25    
+    	
+可以看到，定义了变量，后面就可以不断重复引入使用。改变的时候，只需要改一个地方。同时可以创建不同的多个镜像。 
+
+### ARG	构建参数
+
+构建参数和`ENV`的效果一样,都是设置环境变量。所不同的是,`ARG`所设置的构建环境的环境变量,在将来容器运行时是不会存在这些环境变量的。但是不要因此就使用`ARG`保存密码之类的信息,因为`docker	history`还是可以看到所有值的。 
+
+### VOLUME	定义匿名卷
+
+两种格式：
+
+- `VOLUME	["<路径1>",	"<路径2>"...]`
+- `VOLUME	<路径>`
+
+不应该在容器存储层发生写操作。这样容器就能保持无状态的。对于动态数据，文件，我们应该保存到卷中。为了防止用户在运行时将动态文件写到存储层， 
+所以要预先指定动态文件写入的目录挂载为卷，如下： 
+
+    VOLUME	/data
+    
+这里，指定`/data`为匿名卷，任何写入该目录下的数据都不会写入到容器存储层。这样容器就是无状态的。可以运行时替换掉所挂载卷： 
+
+    docker	run	-d	-v	mydata:/data	xxxx
+    
+在这行命令中,就使用了`mydata`这个命名卷挂载到了`/data`这个位置,替代了`Dockerfile`中定义的匿名卷的挂载配置。  
+
+### EXPOSE	声明端口
+
+格式：`EXPOSE	<端口1>	[<端口2>...]	`    
+
+`EXPOSE`指令是声明运行时容器提供服务端口,这只是一个声明,在运行时并不会因为这个声明应用就会开启这个端口的服务。   
+
+要将`EXPOSE`和在运行时使用`-p	<宿主端口>:<容器端口>`区分开来。`-p	`,是映射宿主端口和容器端口,换句话说,就是将容器的对应端口服务公开给外界访问,而`EXPOSE`仅仅是声明容器打算使用什么端口而已,并不会自动在宿主进行端口映射。
+
+
+
+
 				       

@@ -171,5 +171,73 @@ http://www.jianshu.com/p/a7d7df97fe4b
 
 `jar -uvf rpds.jar BOOT-INF/classes/db.properties `
 
+2.启动jar应用程序shell脚本
+
+    #!/bin/sh
+    # chkconfig: 2345 64 36
+    ## java env 
+    #################### zhengjianyan #######################
+    export JAVA_HOME=/server/java/jdk
+    export JRE_HOME=$JAVA_HOME/jre
+    
+    BASE_PATH=/server/java/service/com.xcsqjr.scf.service
+    VERSION=1.0.0
+    ## service name
+    APP_NAME=all
+    
+    SERVICE_DIR=$BASE_PATH/com.xcsqjr.scf.service.$APP_NAME
+    SERVICE_NAME=com.xcsqjr.scf.service.$APP_NAME-$VERSION
+    #JAR_NAME=$SERVICE_DIR/$SERVICE_NAME/target\.jar
+    JAR_NAME=$SERVICE_DIR/target/$SERVICE_NAME.jar
+    PID=$SERVICE_NAME\.pid
+    
+    rm -rf $SERVICE_DIR/target/*.tmp
+    cd $BASE_PATH
+    cd ..
+    
+    $JAVA_HOME/bin/jar uvf $SERVICE_DIR/target/$SERVICE_NAME.jar application.properties
+    
+    cd $SERVICE_DIR
+    case "$1" in
+    
+        start)
+            nohup $JRE_HOME/bin/java -Xms128m -Xmx256m -jar $JAR_NAME >/dev/null 2>&1 &
+            echo $! > $SERVICE_DIR/target/$PID
+            echo "=== start $SERVICE_NAME"
+            ;;
+    
+        stop)
+            kill `cat $SERVICE_DIR/target/$PID`
+            rm -rf $SERVICE_DIR/target/$PID
+            echo "=== stop $SERVICE_NAME"
+    
+            sleep 5
+            P_ID=`ps -ef | grep -w "$SERVICE_NAME" | grep -v "grep" | awk '{print $2}'`
+            if [ "$P_ID" == "" ]; then
+                echo "=== $SERVICE_NAME process not exists or stop success"
+            else
+                echo "=== $SERVICE_NAME process pid is:$P_ID"
+                echo "=== begin kill $SERVICE_NAME process, pid is:$P_ID"
+                kill -9 $P_ID
+            fi
+            ;;
+    
+        restart)
+            $0 stop
+            sleep 2
+            $0 start
+            echo "=== restart $SERVICE_NAME"
+            ;;
+    
+        *)
+    		echo "==== restart ====="
+            ## restart
+            $0 stop
+            sleep 5
+            $0 start
+            ;;
+    esac
+    exit 0
+
 
 
