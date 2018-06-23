@@ -12,3 +12,6 @@ tags: aws云服务器
 - 下载私钥`*.pem`,放到指定目录下。
 -  给予私钥权限。`chmod 400 .pem`
 - ssh登录。`ssh -i ~/aws-server-key/Seoul-Server-Key.pem ubuntu@13.209.47.139`
+
+## 在安全组开放端口
+
