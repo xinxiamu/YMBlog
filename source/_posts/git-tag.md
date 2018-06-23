@@ -39,6 +39,8 @@ tags: git-tag
     Total 1 (delta 0), reused 0 (delta 0)
     To https://github.com/xinxiamu/ymu-framework.git
      * [new tag]         V1.0 -> V1.0
+
+## 回退版本，tag上修复紧急bug
     
 这个时候，突然发现一个重大bug，需要重新打版本，可以按下面方法来出来：
 
