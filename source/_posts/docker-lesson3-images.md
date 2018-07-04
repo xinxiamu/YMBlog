@@ -493,29 +493,29 @@ _场景二_：
 
 比如启动redis，不以`root`，而以`redis`用户身份启动。 
 
-    FROM	alpine:3.4
+    FROM alpine:3.4
     ...
-    RUN	addgroup	-S	redis	&&	adduser	-S	-G	redis	redis
+    RUN addgroup -S	redis && adduser -S -G redis redis
     ...
-    ENTRYPOINT	["docker-entrypoint.sh"]
+    ENTRYPOINT ["docker-entrypoint.sh"]
     EXPOSE	6379
-    CMD	[	"redis-server"	]
+    CMD ["redis-server"]
     
 可以看到其中为了`redis`服务创建了`redis	`用户,并在最后指定了`ENTRYPOINT`为`docker-entrypoint.sh`脚本。   
 
     #!/bin/sh
     ...
-    #	allow	the	container	to	be	started	with	`--user`
-    if	[	"$1"	=	'redis-server'	-a	"$(id	-u)"	=	'0'	];	then
-    				chown	-R	redis	.
-    				exec	su-exec	redis	"$0"	"$@"
+    #allow the container to be started with	`--user`
+    if ["$1" = 'redis-server' -a "$(id -u)"	= '0'];	then
+    				chown -R redis	.
+    				exec su-exec redis "$0" "$@"
     fi
-    exec	"$@"
+    exec "$@"
     
 执行：
 
-    $	docker	run	-it	redis	id
-    uid=0(root)	gid=0(root)	groups=0(root)
+    $ docker run -it redis id
+    uid=0(root) gid=0(root) groups=0(root)
     
 ### ENV	设置环境变量
 
@@ -580,7 +580,168 @@ node官方Dockerfile例子：
 
 要将`EXPOSE`和在运行时使用`-p	<宿主端口>:<容器端口>`区分开来。`-p	`,是映射宿主端口和容器端口,换句话说,就是将容器的对应端口服务公开给外界访问,而`EXPOSE`仅仅是声明容器打算使用什么端口而已,并不会自动在宿主进行端口映射。
 
+### WORKDIR指定工作目录
+
+格式：`WORKDIR	<工作目录路径>`
+
+该命令可以指定工作目录（当前目录），后面各层都使用该指定目录。该目录如果不存在，则会创建空目录。
+
+写`Dockerfile`千万不能按照`shell`的思维写，应为`docker`是分层的。比如下面错误写法：
+
+     RUN cd /app
+     RUN echo "hello" > world.txt
+     
+构建后，你会发现找不到`/app/world.txt`文件。原因是：在`shell`中执行命令，是在同一进程中，操作的是同样的内存。但是在`docker`中不是。你知道，每一个`RUN`命令都是构建一层的，启动不同的容器。第一次`RUN`只是操作进入`/app`目录，没有操作任何文件变更，只是内存的变化而已，第二次启动了个新的容器，跟第一层的容器完全没关系了。
+所以：在写`Dockerfile`到时候，一定要有分层的思维，每一个完整的操作要在同一层里面做。
+
+如果要改变以后各层的工作目录都在指定的工作目录，那么`WORKDIR`指令就派上用场了。
+
+### `USER`指定当前用户
+
+格式:`USER <用户名>`  用户名系统已经添加好
+
+和`WORKDIR`一样，都会影响后面的每一层。改变执行后面命令的执行身份。
+
+下面建立用户，并切换到该用户，启动`redis`：
+
+    RUN groupadd -r redis && useradd -r -g redis edis
+    USER redis
+    RUN ["redis-server"]
+
+如果以`root`执行脚本，在执行期间想切换用户，可以参考下面做法：
+
+    # 建立redis用户,并使用gosu换另一个用户执行命令
+    RUN groupadd -r redis && useradd -r -g redis redis
+    #下载gosu
+    RUN wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/1.7/
+    gosu-amd64" \
+        && chmod +x /usr/local/bin/gosu	\
+            && gosu nobody true
+    #设置CMD,并以另外的用户执行
+    CMD ["exec","gosu","redis","redis-server"]
+    
+`gosu`使用更多信息参考：https://github.com/tianon/gosu
+
+### HEALTHCHECK 健康检查    
+
+格式：
+- `HEALTHCHECK [选项] CMD <命令>`:设置检查容器健康状况的命令	
+- `HEALTHCHECK NONE`:如果基础镜像有健康检查指令,使用这行可以屏蔽掉其健康检查指令。
+
+该指令是告诉`Docker`应该如何进行判断容器的状态是否正常。
+
+### ONBUILD	为他人做嫁衣裳
+
+格式: `ONBUILD <其它指令>	`
+
+`ONBUILD` 后面的指令，在当前镜像构建的时候是不会执行的，只有以它所在的镜像为基础镜像的镜像在构建的时候才会执行。 
+
+`Docker`中其它的命令都是为了定制当前的镜像准备的，只有`ONBUILD`是为了他人而准备。   
+
+所以，这里就可以看出，该指令可以用来做命令的继承。类似`maven`中的父`pom`。把`ONBUILD`后面的命令都看做各个子`Dockerfile`的共用命令。
+
+    FROM node:slim
+    RUN mkdir /app
+    WORKDIR	/app
+    ONBUILD	COPY ./package.json /app
+    ONBUILD RUN ["npm",	"install"]
+    ONBUILD	COPY . /app/
+    CMD ["npm", "start"]
+    
+ 后面每一个子`Dockerfile`只需要以上面镜像伟基础镜像:
+ 
+    FROM my-node  
+    
+这样，`ONBUILD`后面的指令都会在每个子`Dockerfile`中执行。     
 
 
+## 删除本地镜像
 
-				       
+可以使用命令`docker rmi`，格式：
+
+    `docker	rmi	[选项]	<镜像1>	[<镜像2>	...]`
+    
+    _注意_: docker rm 命令是删除容器,不要混淆。
+
+可以用ID、镜像名、摘要删除镜像：
+
+    mutian@mutian-ThinkPad-T440p:~$ sudo docker images
+    [sudo] password for mutian: 
+    REPOSITORY           TAG                 IMAGE ID            CREATED             SIZE
+    mysql/mysql-server   latest              02d081b9c73e        2 months ago        300MB
+    nginx                v3                  b92f375b41f0        4 months ago        109MB
+    nginx                v2                  e8023c09eed5        4 months ago        109MB
+    nginx                latest              e548f1a579cf        4 months ago        109MB
+    centos               latest              ff426288ea90        5 months ago        207MB
+    hello-world          latest              f2a91732366c        7 months ago        1.85kB
+    season/fastdfs       latest              c6cc94c34f8e        2 years ago         205MB
+
+1. 用短id删除，人工输入的时候使用，方便：
+
+`$	docker	rmi	ff4`
+
+2. 用长id，一般使用脚本的时候：
+
+`$	docker	rmi	f2a91732366c`
+
+3. 用镜像名,`<仓库名>:<标签>`：
+
+`docker	rmi	nginx：v3`
+
+4. 使用摘要，最精确： 
+    
+查看摘要：
+    
+
+    mutian@mutian-ThinkPad-T440p:~$ sudo docker images --digests
+    REPOSITORY           TAG                 DIGEST                                                                    IMAGE ID            CREATED             SIZE
+    mysql/mysql-server   latest              sha256:f1cb1e3f0124601b1496f485e9f4401ad10138294b5a38d932089daafd555e34   02d081b9c73e        2 months ago        300MB
+    nginx                v3                  <none>                                                                    b92f375b41f0        4 months ago        109MB
+    nginx                v2                  <none>                                                                    e8023c09eed5        4 months ago        109MB
+    nginx                latest              sha256:4771d09578c7c6a65299e110b3ee1c0a2592f5ea2618d23e4ffe7a4cab1ce5de   e548f1a579cf        4 months ago        109MB
+    centos               latest              sha256:6247c7082d4c86c61b00f7f2e3edbf7f072a24aa8edc28b5b68b3de3101bc1ce   ff426288ea90        5 months ago        207MB
+    hello-world          latest              sha256:083de497cff944f969d8499ab94f07134c50bcf5e6b9559b27182d3fa80ce3f7   f2a91732366c        7 months ago        1.85kB
+    season/fastdfs       latest              sha256:408acdebaa278e8ed875f7c63aa0c7ac8e633cf92f615d8295d279e137217003   c6cc94c34f8e        2 years ago         205MB
+
+    
+删除：
+
+    docker rmi centos@sha256:6247c7082d4c86c61b00f7f2e3edbf7f072a24aa8edc28b5b68b3de3101bc1ce
+ 
+
+### Untagged和Deleted
+
+仔细观察，发现两种删除行为。
+
+实际上，镜像都是一层层的，一个镜像有多个标签，只有每个标签都取消了，才有可能删除镜像。删除的时候从上最上层往下，逐步判断删除。 
+
+### 用`docker images`命令来配合
+
+配合`docker	images	-q`，可以成批的删除你想要删除的镜像，可以指定你想要删除的镜像。
+
+删除虚悬镜像：
+
+`$	docker	rmi	$(docker	images	-q	-f	dangling=true)`
+
+删除所有仓库名为redis的镜像:
+
+`$	docker	rmi	$(docker	images	-q	redis)`
+
+删除所有在mongo:3.2之前的镜像:
+
+`$	docker	rmi	$(docker	images	-q	-f	before=mongo:3.2)`
+
+
+### docker image
+
+后面版本，推荐使用`docker image`来管理镜像。
+
+如删除：
+
+`$	docker	image	rm`
+
+## 镜像的实现原理
+
+[UnionFS](https://en.wikipedia.org/wiki/UnionFS)
+
+   
