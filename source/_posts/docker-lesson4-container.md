@@ -118,10 +118,108 @@ _注意_: 容器是否能长久运行，与`docker run`指定的命令有关，�
 命令`docker start`可以重启终止状态下的容器。 
 命令`docker restart`将会终止一个一个运行的容器后并重启。
 
+- 强制停止容器
+
+可使用`docker kill` 命令停止一个或更多运行着的容器。
+
+格式：`docker kill [OPTIONS] CONTAINER [CONTAINER...]`
+
+例子：`docker kill 784fd3b294d7`
+
+
 _Doker 1.13+_:
 
     docker container ls
     docker container start
     docker container restart
     
+## 进入容器
+
+使用参数`-d`启动容器后，容器在后台执行了。有时候，需要进入容器操作。进入容器有多种方式：使用`docker	attach`命令或者`nsenter`工具等。 
     
+- attach命令
+
+命令格式：`docker attach [COMMAND]`  
+具体使用请百度……
+
+使用该命令有时候并不方便，当多个窗口同事通过`attach`命令进入到同一个容器的的时候，所有的窗口都会同步显示。这样，当有一个窗口阻塞的时候，所有的窗口都会阻塞。
+
+- nsenter进入容器
+
+nsenter工具包含在util-linux 2.23或更高版本中。  
+
+为了进入容器，你还需要找到容器的第一个进程的	PID； 
+
+    docker inspect --format "{{.State.Pid}}" $CONTAINER_ID
+
+通过这个PID就可以进入容器了：  
+`nsenter --target "$PID" --mount --uts --ipc --net --pid`
+
+完整例子： 
+
+    [root@localhost ~]# docker ps
+    CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                         NAMES
+    784fd3b294d7        nginx               "nginx -g 'daemon off"   55 minutes ago      Up 3 minutes        443/tcp, 0.0.0.0:91->80/tcp   backstabbing_archimedes
+    [root@localhost ~]# docker inspect --format "{{.State.Pid}}" 784fd3b294d7
+    95492
+    [root@localhost ~]# nsenter --target 95492 --mount --uts --ipc --net --pid
+    root@784fd3b294d7:/#
+    
+可以把以上命令封装程`shell`命令，简化操作。 
+
+- `docker exec`进入容器
+
+`docker exec -it 容器id /bin/bash`
+
+## 导出容器
+
+如果要导出本地的某个容器，可以使用命令`docker export`： 
+命令格式： `docker export [OPTIONS] CONTAINER`    
+参数：
+  		
+|  Name,shorthand  | Default | 将内容写到文件而非STDOUT |
+| :------: | :------: | :-----: |
+| --output, -o | - | 将内容写到文件而非STDOUT |
+
+示例：
+
+    docker export red_panda > latest.tar
+    docker export --output="latest.tar" red_panda
+
+## 导入容器
+
+使用`docker import` 命令即可从归档文件导入内容并创建镜像。    
+命令格式： `docker import [OPTIONS] file|URL|- [REPOSITORY[:TAG]]`  
+
+参数： 
+
+|  Name,shorthand  | Default | 将内容写到文件而非STDOUT |
+| :------: | :------: | :-----: |
+| `--change, -c` | - | 将Dockerfile指令应用到创建的镜像 |
+| `--message, -m` | - | 为导入的镜像设置提交信息 |
+
+示例：
+
+    docker import nginx2.tar nginx
+
+## 删除容器
+
+可以使用命令`docker rm`来删除一个处于终止状态的容器。例如：
+
+    docker rm rusting_newton
+    
+如果要删除一个正在运行的容器，可以添加参数`-f`,Docker会发送`SIGKILL`信号给容器。 
+
+清理所有处于终止状态下容器： 
+
+    $ docker ps -a
+    $ docker rm $(docker ps -a -q)    
+
+- Docker1.13+版本,使用命令：
+
+    docker container rm trusting_newton
+    docker container prune
+
+## 参考资源
+
+- http://itmuch.com/docker/05-docker-command-containers/    

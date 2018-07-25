@@ -744,4 +744,12 @@ node官方Dockerfile例子：
 
 [UnionFS](https://en.wikipedia.org/wiki/UnionFS)
 
+## 配置镜像加速器
+
+注册阿里云账号后，即可在阿里云控制台（https://cr.console.aliyun.com/#/accelerator）看到类似如下的页面。
+
+{% asset_img yy.png %}
+
+按照上图说明配置即可。 
+
    

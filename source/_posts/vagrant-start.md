@@ -88,7 +88,7 @@ tags: vagrant-start
 
 
     mutian@mutian-ThinkPad-T440p:~/dev/vagrant$ cd xcsqjr-dev/
-    mutian@mutian-ThinkPad-T440p:~/dev/vagrant/xcsqjr-dev$ vagrant init
+    mutian@mutian-ThinkPad-T440p:~/dev/vagrant/xcsqjr-dev$ vagrant init centos/7
     A `Vagrantfile` has been placed in this directory. You are now
     ready to `vagrant up` your first virtual environment! Please read
     the comments in the Vagrantfile as well as documentation on
@@ -187,7 +187,108 @@ tags: vagrant-start
 
 - 启动虚拟机
 
-``    
+
+    mutian@mutian-ThinkPad-T440p:~$ cd dev/vagrant/ymu-dev/
+    mutian@mutian-ThinkPad-T440p:~/dev/vagrant/ymu-dev$ vagrant up
+    Bringing machine 'default' up with 'virtualbox' provider...
+    ==> default: Checking if box 'centos/7' is up to date...
+    ==> default: Clearing any previously set forwarded ports...
+    ==> default: Clearing any previously set network interfaces...
+    ==> default: Preparing network interfaces based on configuration...
+        default: Adapter 1: nat
+    ==> default: Forwarding ports...
+        default: 22 (guest) => 2222 (host) (adapter 1)
+    ==> default: Running 'pre-boot' VM customizations...
+    ==> default: Booting VM...
+    ==> default: Waiting for machine to boot. This may take a few minutes...
+        default: SSH address: 127.0.0.1:2222
+        default: SSH username: vagrant
+        default: SSH auth method: private key
+ 
+ 打开virtualbox,可以看到centos7_ymu的虚拟机已经启动。
+        
+ {%asset_img e.png%}  
+ 
+ - 进入该虚拟机
+ 
+ ` vagrant ssh`
+ 
+    mutian@mutian-ThinkPad-T440p:~/dev/vagrant/ymu-dev$ vagrant ssh
+    Last login: Mon Jul  9 07:40:01 2018 from 10.0.2.2
+    [vagrant@ymu ~]$ 
+
+下面就可以在里面，类似在真实的服务器操作系统里面一样，安装各种开发软件，配置各种开发环境了。 
+
+- 登出虚拟机
+
+        [vagrant@ymu ~]$ logout
+        Connection to 127.0.0.1 closed.
+        mutian@mutian-ThinkPad-T440p:~/dev/vagrant/ymu-dev$ 
+        
+- 停止运行虚拟机
+
+        mutian@mutian-ThinkPad-T440p:~/dev/vagrant/ymu-dev$ vagrant halt
+        ==> default: Attempting graceful shutdown of VM...
+
+- 挂起虚拟机
+
+`vagrant shutdown`
+
+- 重新加载配置启动
+
+`vagrant reload`
+
+### 配置
+
+    config.vm.box = "centos/7" #和已经下载的box名字一致
+    config.vm.hostname = "ymu"  
+    #config.vm.box_version = "1.1.0"	
+    config.vm.box_url = "http://ymu.box"
+    config.vm.synced_folder "/home/mutian/dev/java/github/ymu-micro-service", "/vagrant", :ext4 => true #共享文件夹
+  
+#### 配置共享文件
+
+注：如果不配置共享目录，默认会把`Vagrantfile`文件所在的目录同步到虚拟机中的`、vagrant`目录下。
+
+`config.vm.synced_folder "/home/mutian/dev/java/github/ymu-micro-service", "/vagrant", :ext4 => true #共享文件夹`
+
+第一个路径为宿主电脑文件夹，第二个为同步的虚拟机文件夹。宿主机文件夹中所有内容将实时同步到虚拟机中文件夹下。
+
+注意文件类型。在`ubuntu`下查询自己系统文件类型执行命令`df -lhT`。
+
+登录虚拟机，进入`/vagrant`,将看到：
+
+    [vagrant@ymu vagrant]$ ls
+    logs    ymu-config-repo    ymu-hystrix-dashboard  ymu-server-eureka
+    target  ymu-config-server  ymu-hystrix-turbine    ymu-service-basic
+
+看到宿舍机相关目录下的内容同步过来了。
+
+所以，这个时候，你就可以只在宿主机编辑代码，在虚拟机里面编译执行了。
+
+#### 配置网络
+
+## 为自己的box安装各种应用环境
+
+### docker安装
+
+设置自启动：`systemctl enable docker.service`
+
+参考之前blog。
+
+### 安装`nginx`
+
+- docker运行方式
+- 传统按照方式。
+
+### 安装`redis`
+
+- docker运行方式
+
+https://hub.docker.com/_/redis/
+
+- 传统按照方式。
+
 
 ## 学习资源
 

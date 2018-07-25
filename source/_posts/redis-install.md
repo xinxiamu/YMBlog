@@ -90,3 +90,15 @@ $ redis-cli -p 6380 SHUTDOWN
 service redis_6380 -p 6380 start  #启动6380端口实例的redis
 
 $ cd /etc/init.d && ./redis_6380 start  #默认启动6379端口实例的redis
+
+## centos7下安装redis
+
+1. 下载源码。
+
+2. 编译安装：
+
+
+    编译前需要安装依赖 yum install -y gcc tcl
+    然后再编译 make -j 4 MALLOC=libc
+    
+    如果要自动启动：`make install -j 4 MALLOC=libc`
