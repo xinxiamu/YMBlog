@@ -176,6 +176,9 @@ tags: shadowsocks-go
     # 可以把地址改为 0.0.0.0:8118，表示外网也可以通过本机IP作http代理。
     # 这样，你的外网IP为1.2.3.4，别人就可以设置 http://1.2.3.4:8118/ 为http代理。
     　listen-address localhost:8118  #端口可以随意设定
+    
+    上面配置可能导致无法启动privoxy,新版本安全问题导致。改为：   
+    listen-address 192.168.1.115:8118  #端口可以随意设定  
 
 3.重启privoxy
 
