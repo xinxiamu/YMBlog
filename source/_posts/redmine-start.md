@@ -338,6 +338,16 @@ redmine的配置设置文件放在：config/configuration.yml。
 
     lsof -i:3000
     kill -9 pid
+    
+### 开机自启
+
+编辑启动文件
+
+vi /etc/rc.local
+
+最后一行或者适当的位置，加入一下内容。此处必须用绝对路径。注意根据实际redmine路径来填写。
+
+/usr/local/rvm/rubies/ruby-2.0.0-p598/bin/ruby /root/redmine-2.6.0/script/rails server webrick -e production -d    
 
 ### 设置Email/SMTP服务器
 
@@ -396,6 +406,23 @@ redmine的配置设置文件放在：config/configuration.yml。
 看到绿色提示`邮件已发送至 zhangmutian@xcsqjr.com`。证明配置已成功，可以愉快的使用了。
 
 
+### scm配置
+
+主要是svn和git版本库管理工具。  
+
+如：svn的  
+`scm_subversion_command: "svn_replacement.exe"`
+
+只需要安装svn或者git服务端，然后在配置文件指向即可。   
+
+### 其它的配置
+
+一般采用默认的就好了。 
+
+1.附件存储路径。`attachments_storage_path: /var/redmine/files`   
+2.日志保存路径。   
+
+等等……
 
 ------------------------------------------------------
 
