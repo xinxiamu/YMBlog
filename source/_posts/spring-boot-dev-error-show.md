@@ -125,3 +125,31 @@ tags: spring-boot使用经验
     于是网上一番搜索，找到类似的解决方法：
     Properties prop = new Properties();
     InputStream is = this.getClass().getResourceAsStream(filePath);     
+    
+## 取消自动配置
+
+### 方式一
+
+去掉pom中相关的依赖包。
+
+### 代码中配置
+
+1.使用了@EnableAutoConfiguration的时候    
+
+    @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
+    
+2.使用了@SpringBootApplication的时候
+
+    @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+    1
+3.使用了@SpringCloudApplication的时候
+
+    @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
+    @SpringCloudApplication
+    
+4.通过配置文件来设置
+
+    spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+    1
+    
+    
