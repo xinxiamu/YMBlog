@@ -34,8 +34,8 @@ tags: javapoet-apt-annotation
 
     <plugin>
         <groupId>com.mysema.maven</groupId>
-        <artifactId>maven-apt-plugin</artifactId>
-        <version>1.0.4</version>
+        <artifactId>apt-maven-plugin</artifactId>
+        <version>1.1.3</version>
         <executions>
             <execution>
                 <goals>
@@ -200,5 +200,12 @@ tags: javapoet-apt-annotation
 那么用`mvn install`或者运行该类编译代码时，将会调用注解处理类`HelloProcessor`进行代码生成。
 
 ----------------------------------------------------------------------------------
+
+_注意_:   
+在引入apt插件后，要去掉java的编译时注解，只能二选其一，否则apt会生成一次代码，java编译时注解还会生成一次代码，将重复报错。  
+- 用apt插件，去掉processor中的`@AutoService(Processor.class)`注解。  
+- 用java编译时注解，在processor引入`@AutoService(Processor.class)`注解，不需要apt插件。
+
+------------------------------------------------------------------------------------------
 
 <<完>>
