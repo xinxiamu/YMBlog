@@ -289,6 +289,23 @@ https://hub.docker.com/_/redis/
 
 - 传统按照方式。
 
+## 打包分发
+
+1.打包，把上面自己定制的box打包。     
+命令： 
+- `vagrant package --output xxx.box`
+-  `vagrant package --output xxx.box --base 虚拟机名称`  
+
+2.分发，把打好的包通过优盘等，给其它人用。
+
+3.更新软件
+
+- 老用户
+
+- 新用户   
+用最新的打包即可。
+
+
 
 ## 学习资源
 
