@@ -18,7 +18,13 @@ html转pdf工具wkhtmltopdf的使用记录……
 
 1.中文字体乱码的问题。
 
+linux：把字体{%asset_link simsun.ttc simsun.ttc%}添加到系统`usr/share/fonts`下。
+
 2.设定纸张大小，内容随纸张大小。
+
+3.Arial字体
+
+直接把{%asset_link Arial.zip Arial%}中相关字体文件添加到系统`usr/share/fonts`。
 
 参考：https://blog.csdn.net/churujianghu/article/details/75076255
 
