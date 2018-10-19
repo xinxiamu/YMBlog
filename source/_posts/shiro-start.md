@@ -7,7 +7,7 @@ tags: shiro入门
 
 Apache Shiro([官网](http://shiro.apache.org))是个java的安全框架，轻便、api简单、功能全面的特性获得 许多开发者的青睐。其提供了认证、授权、加密以及会话管理等功能……
 
-## 介绍
+### 一.介绍
 
 #### 1.功能特性
 Shiro 包含 10 个内容，如下图：
@@ -80,7 +80,7 @@ Shiro 包含 10 个内容，如下图：
  anon，authcBasic，auchc，user 是认证过滤器。
  perms，roles，ssl，rest，port 是授权过滤器。   
 
-## 认证
+### 二.认证
 
 1.认证路程图：
 {%asset_img shiro-04.png%} 
@@ -133,7 +133,7 @@ public class AuthenticationTest {
 
 ```
 
-## 授权
+### 三.授权
 
 1.流程图：
 {%asset_img shiro-05.png%}
@@ -193,7 +193,9 @@ public class AuthenticationTest {
 
 ```
 
-## Shiro自定义Realm
+
+
+### 四.Shiro自定义Realm
 
 #### 1.IniRealm讲解
 
@@ -686,3 +688,181 @@ public class CustomRealmTest {
 }
 
 ```
+
+### 五.Shiro加密
+
+前面介绍的密码都是明文的，实际的密码在数据库中是加密的。    
+
+下面在自定义的Realm中使用加密。  
+
+- 代码：
+
+```java
+package com.example.springboot2shirostart;
+
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.util.ByteSource;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+public class CustomRealm extends AuthorizingRealm {
+
+    final String realmName = this.getClass().getSimpleName(); //自定义realm名称
+
+    Map<String,String> userMap = new HashMap<>(16);
+
+    {
+//        userMap.put("zmt","123456");
+//        userMap.put("zmt","e10adc3949ba59abbe56e057f20f883e"); //数据库的密码是密文，不加盐
+        userMap.put("zmt","640a19b710290a9ff4d72e70cdd21913"); //md5加盐密码
+        userMap.put("xr","654321");
+
+        super.setName(realmName); //设置名称
+    }
+
+
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+        String username = (String) principals.getPrimaryPrincipal();
+        //从数据库或者缓存中获取角色数据。
+        Set<String> roles = getRolesByUsername(username);
+        Set<String> permissions = getPermissionByUsername(username);
+
+        SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
+        authorizationInfo.setStringPermissions(permissions); //设置权限
+        authorizationInfo.setRoles(roles); //设置角色
+
+        return authorizationInfo;
+    }
+
+    /**
+     * 模拟通过用户名获取权限。
+     * @param username
+     * @return
+     */
+    private Set<String> getPermissionByUsername(String username) {
+        Set<String> permissions = new HashSet<>();
+        permissions.add("admin:delete");
+        permissions.add("user:select");
+        permissions.add("user:update");
+        return permissions;
+    }
+
+    /**
+     * 模拟获取角色。根据用户名获取角色。
+     * @param username
+     * @return
+     */
+    private Set<String> getRolesByUsername(String username) {
+        Set<String> roles = new HashSet<>();
+        roles.add("admin");
+        roles.add("user");
+        return roles;
+    }
+
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
+
+        //从主体传过来认证信息,获得用户名
+        String username = (String) token.getPrincipal();
+        System.out.println("username:" + username);
+
+        //通过用户名到数据库中获取凭证
+        String pwd = getPwdByUsername(username);
+        if (pwd == null) {
+            return null;
+        }
+
+        SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(username,pwd,realmName);
+        authenticationInfo.setCredentialsSalt(ByteSource.Util.bytes("aaa")); //密码加盐后，这里要加上这句
+
+        return authenticationInfo;
+    }
+
+    /**
+     * 模拟获取数据库数据。根据用户名获取用户密码
+     * @param username 用户名。
+     * @return
+     */
+    private String getPwdByUsername(String username) {
+        return userMap.get(username);
+    }
+
+
+}
+
+```
+
+```java
+package com.example.springboot2shirostart;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.crypto.hash.Md5Hash;
+import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.subject.Subject;
+import org.junit.Test;
+
+/**
+ * 简单认证
+ */
+public class CustomRealmTest {
+
+
+    @Test
+    public void  test1() {
+
+        CustomRealm customRealm = new CustomRealm();//自定义Realm
+
+        //1.创建securityManager环境
+        DefaultSecurityManager defaultSecurityManager = new DefaultSecurityManager();
+        defaultSecurityManager.setRealm(customRealm);
+
+        //设置散列加密
+        HashedCredentialsMatcher matcher = new HashedCredentialsMatcher();
+        matcher.setHashAlgorithmName("md5");//设置加密方式
+        matcher.setHashIterations(1); //设置加密次数
+        customRealm.setCredentialsMatcher(matcher); //设置加密对象
+
+        //2.主体提交认证请求
+        SecurityUtils.setSecurityManager(defaultSecurityManager);
+        Subject subject = SecurityUtils.getSubject();
+
+        UsernamePasswordToken token = new UsernamePasswordToken("zmt","e10adc3949ba59abbe56e057f20f883e");//用户,密码MD5加密。明文：123456
+        subject.login(token);
+        System.out.println("isAuthenticated:" + subject.isAuthenticated());//已认证
+
+//        subject.checkRole("admin"); //admin通过，admin1报错
+        subject.checkRoles("admin","user"); //拥有该两个角色
+
+        //权限
+        subject.checkPermission("user:select");//jdbcRealm.setPermissionsLookupEnabled(true);
+//        subject.checkPermission("user:insert"); //报错，么有insert权限
+        subject.checkPermission("user:update"); //有update权限
+    }
+
+    @Test
+    public void genPwd() {
+//        Md5Hash md5Hash = new Md5Hash("123456"); //md5加密密码，不加盐
+//        System.out.println("md5加密：" + md5Hash);
+
+        Md5Hash md5Hash = new Md5Hash("e10adc3949ba59abbe56e057f20f883e","aaa"); //md5加密密码，加盐，密码更加难以识破，盐一般用随机数，这里写死
+        System.out.println("md5加盐加密：" + md5Hash);
+    }
+}
+
+```
+
+
+
