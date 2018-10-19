@@ -137,3 +137,552 @@ public class AuthenticationTest {
 
 1.流程图：
 {%asset_img shiro-05.png%}
+
+2。代码示例：
+
+```java
+package com.example.springboot2shirostart;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.realm.SimpleAccountRealm;
+import org.apache.shiro.subject.Subject;
+import org.junit.Before;
+import org.junit.Test;
+
+/**
+ * 简单认证
+ */
+public class AuthenticationTest {
+
+    SimpleAccountRealm simpleAccoutRealm = new SimpleAccountRealm();
+
+    @Before
+    public void addUser() {
+//        simpleAccoutRealm.addAccount("zmt","123456");
+//        simpleAccoutRealm.addAccount("zmt1","123456");
+
+        simpleAccoutRealm.addAccount("zmt","123456","admin","user"); //添加角色
+    }
+
+    @Test
+    public void  testAuthentication() {
+        //1.创建securityManager环境
+        DefaultSecurityManager defaultSecurityManager = new DefaultSecurityManager();
+        defaultSecurityManager.setRealm(simpleAccoutRealm);
+
+        //2.主体提交认证请求
+        SecurityUtils.setSecurityManager(defaultSecurityManager);
+        Subject subject = SecurityUtils.getSubject();
+
+        UsernamePasswordToken token = new UsernamePasswordToken("zmt","123456");
+        subject.login(token);
+        System.out.println("isAuthenticated:" + subject.isAuthenticated());//已认证
+
+        subject.checkRole("admin"); //admin通过，admin1报错
+        subject.checkRoles("admin","user1"); //拥有该两个角色
+
+//        subject.logout();//退出登录
+//        System.out.println("isAuthenticated:" + subject.isAuthenticated());//未认证
+
+    }
+
+
+}
+
+```
+
+## Shiro自定义Realm
+
+#### 1.IniRealm讲解
+
+代码样例：
+
+```java
+package com.example.springboot2shirostart;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.realm.text.IniRealm;
+import org.apache.shiro.subject.Subject;
+import org.junit.Test;
+
+/**
+ * 简单认证
+ */
+public class IniRealmTest {
+
+    @Test
+    public void  test1() {
+
+        IniRealm iniRealm = new IniRealm("classpath:user.ini");
+
+        //1.创建securityManager环境
+        DefaultSecurityManager defaultSecurityManager = new DefaultSecurityManager();
+        defaultSecurityManager.setRealm(iniRealm);
+
+        //2.主体提交认证请求
+        SecurityUtils.setSecurityManager(defaultSecurityManager);
+        Subject subject = SecurityUtils.getSubject();
+
+        UsernamePasswordToken token = new UsernamePasswordToken("zmt","123456");
+        subject.login(token);
+        System.out.println("isAuthenticated:" + subject.isAuthenticated());//已认证
+
+        subject.checkRole("admin"); //admin通过，admin1报错
+        subject.checkRoles("admin","user"); //拥有该两个角色
+
+        //权限
+        subject.checkPermission("user:delete");
+//        subject.checkPermission("user:insert"); //报错，么有insert权限
+        subject.checkPermission("user:update"); //报错，没有update权限
+    }
+
+
+}
+
+```
+
+```text
+编辑：user.ini
+
+[users]
+zmt=123456,admin,user
+[roles]
+admin=user:delete,user:update
+```
+#### 2.JdbcRealm讲解
+
+用户、角色、权限数据都在数据库里面。而不是在配置文件里面。 
+两种方式，一种是使用默认查询语句；另外一种是自己设计表，写sql语句，不必遵守默认的。   
+
+##### 2.1.默认方式
+
+- 首先，创建相关默认数据表：   
+```sql
+/*
+Navicat MySQL Data Transfer
+
+Source Server         : localhost
+Source Server Version : 50718
+Source Host           : localhost:3307
+Source Database       : shiro-test
+
+Target Server Type    : MYSQL
+Target Server Version : 50718
+File Encoding         : 65001
+
+Date: 2018-10-15 17:09:45
+*/
+
+SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for roles_permissions
+-- ----------------------------
+DROP TABLE IF EXISTS `roles_permissions`;
+CREATE TABLE `roles_permissions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `role_name` varchar(255) NOT NULL,
+  `permission` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `role_name` (`role_name`),
+  CONSTRAINT `roles_permissions_ibfk_1` FOREIGN KEY (`role_name`) REFERENCES `user_roles` (`role_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Records of roles_permissions
+-- ----------------------------
+INSERT INTO `roles_permissions` VALUES ('1', 'admin', 'user:select');
+
+-- ----------------------------
+-- Table structure for user_roles
+-- ----------------------------
+DROP TABLE IF EXISTS `user_roles`;
+CREATE TABLE `user_roles` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) NOT NULL,
+  `role_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `username` (`username`),
+  KEY `role_name` (`role_name`),
+  CONSTRAINT `user_roles_ibfk_1` FOREIGN KEY (`username`) REFERENCES `users` (`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Records of user_roles
+-- ----------------------------
+INSERT INTO `user_roles` VALUES ('1', 'zmt', 'admin');
+
+-- ----------------------------
+-- Table structure for users
+-- ----------------------------
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `password_salt` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `username` (`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Records of users
+-- ----------------------------
+INSERT INTO `users` VALUES ('1', 'zmt', '123456', 'abcd');
+SET FOREIGN_KEY_CHECKS=1;
+
+```
+- 代码样例：
+```java
+package com.example.springboot2shirostart;
+
+import com.alibaba.druid.pool.DruidDataSource;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.realm.jdbc.JdbcRealm;
+import org.apache.shiro.subject.Subject;
+import org.junit.Test;
+
+/**
+ * 简单认证
+ */
+public class JdbcRealmTest {
+
+    DruidDataSource dataSource = new DruidDataSource();
+
+    {
+        dataSource.setUrl("jdbc:mysql://localhost:3307/shiro-test");
+        dataSource.setUsername("root");
+        dataSource.setPassword("root");
+    }
+
+    /**
+     * 查询默认的数据表做相关操作。
+     */
+    @Test
+    public void  test1() {
+
+        JdbcRealm jdbcRealm = new JdbcRealm();
+        jdbcRealm.setDataSource(dataSource); //设置数据源
+        jdbcRealm.setPermissionsLookupEnabled(true); //是否可以查看权限。默认为false。不打开，则无法查看权限
+
+        //1.创建securityManager环境
+        DefaultSecurityManager defaultSecurityManager = new DefaultSecurityManager();
+        defaultSecurityManager.setRealm(jdbcRealm);
+
+        //2.主体提交认证请求
+        SecurityUtils.setSecurityManager(defaultSecurityManager);
+        Subject subject = SecurityUtils.getSubject();
+
+        UsernamePasswordToken token = new UsernamePasswordToken("zmt","123456");//用户
+        subject.login(token);
+        System.out.println("isAuthenticated:" + subject.isAuthenticated());//已认证
+
+        subject.checkRole("admin"); //admin通过，admin1报错
+//        subject.checkRoles("admin","user"); //拥有该两个角色
+
+        //权限
+        subject.checkPermission("user:select");//jdbcRealm.setPermissionsLookupEnabled(true);
+//        subject.checkPermission("user:insert"); //报错，么有insert权限
+//        subject.checkPermission("user:update"); //报错，没有update权限
+    }
+
+
+}
+
+```
+
+##### 2.2.自己设计表写查询语句
+
+- 创建数据表 
+不必遵循默认规范，表名、字段名都可以自定义。  
+
+脚本： 
+```sql
+/*
+Navicat MySQL Data Transfer
+
+Source Server         : localhost
+Source Server Version : 50718
+Source Host           : localhost:3307
+Source Database       : shiro-test
+
+Target Server Type    : MYSQL
+Target Server Version : 50718
+File Encoding         : 65001
+
+Date: 2018-10-17 11:42:25
+*/
+
+SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for test_role_permissions
+-- ----------------------------
+DROP TABLE IF EXISTS `test_role_permissions`;
+CREATE TABLE `test_role_permissions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `role_name` varchar(255) NOT NULL,
+  `permission` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Records of test_role_permissions
+-- ----------------------------
+INSERT INTO `test_role_permissions` VALUES ('1', 'caiwu', 'user:update');
+
+-- ----------------------------
+-- Table structure for test_user
+-- ----------------------------
+DROP TABLE IF EXISTS `test_user`;
+CREATE TABLE `test_user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_name` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `username` (`user_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Records of test_user
+-- ----------------------------
+INSERT INTO `test_user` VALUES ('1', 'xr', '123456');
+
+-- ----------------------------
+-- Table structure for test_user_role
+-- ----------------------------
+DROP TABLE IF EXISTS `test_user_role`;
+CREATE TABLE `test_user_role` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `test_user_name` varchar(255) NOT NULL,
+  `role_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Records of test_user_role
+-- ----------------------------
+INSERT INTO `test_user_role` VALUES ('1', 'xr', 'caiwu');
+SET FOREIGN_KEY_CHECKS=1;
+```
+- 代码样例：
+```java
+package com.example.springboot2shirostart;
+
+import com.alibaba.druid.pool.DruidDataSource;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.realm.jdbc.JdbcRealm;
+import org.apache.shiro.subject.Subject;
+import org.junit.Test;
+
+/**
+ * 简单认证
+ */
+public class JdbcRealmTest {
+
+    DruidDataSource dataSource = new DruidDataSource();
+
+    {
+        dataSource.setUrl("jdbc:mysql://localhost:3307/shiro-test");
+        dataSource.setUsername("root");
+        dataSource.setPassword("root");
+    }
+
+    @Test
+    public void  test2() {
+
+        JdbcRealm jdbcRealm = new JdbcRealm();
+        jdbcRealm.setDataSource(dataSource); //设置数据源
+        jdbcRealm.setPermissionsLookupEnabled(true); //是否可以查看权限。默认为false。不打开，则无法查看权限
+
+        //创建sql语句，使用自己的表、sql来验证
+        String sql_auth = "SELECT `password` FROM test_user WHERE user_name = ?";
+        jdbcRealm.setAuthenticationQuery(sql_auth);
+        String sql_role = "SELECT role_name FROM test_user_role WHERE test_user_name = ?";
+        jdbcRealm.setUserRolesQuery(sql_role);
+        String sql_permisstion = "SELECT permission FROM test_role_permissions WHERE role_name = ?";
+        jdbcRealm.setPermissionsQuery(sql_permisstion);
+
+        //1.创建securityManager环境
+        DefaultSecurityManager defaultSecurityManager = new DefaultSecurityManager();
+        defaultSecurityManager.setRealm(jdbcRealm);
+
+        //2.主体提交认证请求
+        SecurityUtils.setSecurityManager(defaultSecurityManager);
+        Subject subject = SecurityUtils.getSubject();
+
+        UsernamePasswordToken token = new UsernamePasswordToken("xr","123456");//用户
+        subject.login(token);
+        System.out.println("isAuthenticated:" + subject.isAuthenticated());//已认证
+
+        subject.checkRole("caiwu");
+
+        //权限
+        subject.checkPermission("user:update");//jdbcRealm.setPermissionsLookupEnabled(true);
+    }
+
+
+}
+
+```
+
+#### 3.自定义Realm
+
+- 创建类CustomRealm
+
+自定义Realm需要继承`AuthorizingRealm`。
+
+```java
+package com.example.springboot2shirostart;
+
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.subject.PrincipalCollection;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+public class CustomRealm extends AuthorizingRealm {
+
+    final String realmName = this.getClass().getSimpleName(); //自定义realm名称
+
+    Map<String,String> userMap = new HashMap<>(16);
+
+    {
+        userMap.put("zmt","123456");
+        userMap.put("xr","654321");
+
+        super.setName(realmName); //设置名称
+    }
+
+
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+        String username = (String) principals.getPrimaryPrincipal();
+        //从数据库或者缓存中获取角色数据。
+        Set<String> roles = getRolesByUsername(username);
+        Set<String> permissions = getPermissionByUsername(username);
+
+        SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
+        authorizationInfo.setStringPermissions(permissions); //设置权限
+        authorizationInfo.setRoles(roles); //设置角色
+
+        return authorizationInfo;
+    }
+
+    /**
+     * 模拟通过用户名获取权限。
+     * @param username
+     * @return
+     */
+    private Set<String> getPermissionByUsername(String username) {
+        Set<String> permissions = new HashSet<>();
+        permissions.add("admin:delete");
+        permissions.add("user:select");
+        permissions.add("user:update");
+        return permissions;
+    }
+
+    /**
+     * 模拟获取角色。根据用户名获取角色。
+     * @param username
+     * @return
+     */
+    private Set<String> getRolesByUsername(String username) {
+        Set<String> roles = new HashSet<>();
+        roles.add("admin");
+        roles.add("user");
+        return roles;
+    }
+
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
+
+        //从主体传过来认证信息,获得用户名
+        String username = (String) token.getPrincipal();
+        System.out.println("username:" + username);
+
+        //通过用户名到数据库中获取凭证
+        String pwd = getPwdByUsername(username);
+        if (pwd == null) {
+            return null;
+        }
+
+        SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(username,pwd,realmName);
+
+        return authenticationInfo;
+    }
+
+    /**
+     * 模拟获取数据库数据。根据用户名获取用户密码
+     * @param username 用户名。
+     * @return
+     */
+    private String getPwdByUsername(String username) {
+        return userMap.get(username);
+    }
+
+}
+
+```
+
+- 测试：
+
+```java
+package com.example.springboot2shirostart;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.subject.Subject;
+import org.junit.Test;
+
+/**
+ * 简单认证
+ */
+public class CustomRealmTest {
+
+
+    @Test
+    public void  test1() {
+
+        CustomRealm customRealm = new CustomRealm();//自定义Realm
+
+        //1.创建securityManager环境
+        DefaultSecurityManager defaultSecurityManager = new DefaultSecurityManager();
+        defaultSecurityManager.setRealm(customRealm);
+
+        //2.主体提交认证请求
+        SecurityUtils.setSecurityManager(defaultSecurityManager);
+        Subject subject = SecurityUtils.getSubject();
+
+        UsernamePasswordToken token = new UsernamePasswordToken("zmt","123456");//用户
+        subject.login(token);
+        System.out.println("isAuthenticated:" + subject.isAuthenticated());//已认证
+
+//        subject.checkRole("admin"); //admin通过，admin1报错
+        subject.checkRoles("admin","user"); //拥有该两个角色
+
+        //权限
+        subject.checkPermission("user:select");//jdbcRealm.setPermissionsLookupEnabled(true);
+//        subject.checkPermission("user:insert"); //报错，么有insert权限
+        subject.checkPermission("user:update"); //有update权限
+    }
+}
+
+```
