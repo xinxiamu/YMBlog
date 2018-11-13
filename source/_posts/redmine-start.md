@@ -212,6 +212,8 @@ ruby： ruby-2.3.6.tar.gz
       username: redmine
       password: redmine
       
+_注意_: 主机名用`localhost`可能报错，要改成`127.0.0.1`。      
+      
 ### 安装依赖包
 
 1.安装ruby环境。
