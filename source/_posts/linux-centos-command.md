@@ -191,4 +191,153 @@ tags: centos常用命令
 
     # top -b -n1 | mail -s 'Process snapshot' you@example.com
     
+## 查看服务器情况
+
+### 1.查看服务器CPU型号  
+
+    grep "model name" /proc/cpuinfo | cut -f2 -d:  
+    
+### 2.查看服务器内存容量
+
+    grep MemTotal /proc/meminfo
+    grep MemTotal /proc/meminfo | cut -f2 -d:
+    free -m |grep "Mem" | awk '{print $2}' 
+    
+### 3.查看服务器的CPU是32位还是64位
+
+    getconf LONG_BIT
+    
+### 4.查看当前Linux的版本
+
+    more /etc/redhat-release cat /etc/redhat-release
+    
+### 5.查看Linux内核版本
+
+    uname -r
+    uname -a
+    
+### 6.查看服务器当前时间
+
+    date
+    
+### 7.查看服务器硬盘和分区
+
+    df -h
+    fdisk -l
+    
+### 8.查看挂载情况
+
+    mount
+    
+### 9.查看目录大小
+
+    du /etc -sh
+    
+### 10.查看服务器初始安装的软件包
+
+    cat -n /root/install.log
+    more /root/install.log | wc -l
+    
+### 11.查看已经安装的软件包
+
+    rpm -qa
+    rpm -qa | wc -l
+    yum list installed | wc -l
+    
+### 12.查看服务器键盘布局
+
+    cat /etc/sysconfig/keyboard
+    cat /etc/sysconfig/keyboard | grep KEYTABLE | cut -f2 -d=
+    
+### 13.查看Selinux状态
+
+    sestatus
+    sestatus | cut -f2 -d:
+    cat /etc/sysconfig/selinux
+    
+### 14.查看服务器网卡的ip，Mac地址,在ifcfg-eth0 文件里你可以看到mac，网关等信息。
+    
+    ifconfig
+    cat /etc/sysconfig/network-scripts/ifcfg-eth0 | grep IPADDR
+    cat /etc/sysconfig/network-scripts/ifcfg-eth0 | grep IPADDR | cut -f2 -d=
+    ifconfig eth0 |grep "inet addr:" |awk '{print $2}'|cut -c 6-
+    ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}'
+    
+### 15.查看服务器默认网关
+
+    cat /etc/sysconfig/network
+    
+### 16.查看服务器的默认DNS
+
+    cat /etc/resolv.conf
+    
+### 17.查看服务器默认语言
+
+    echo $LANG $LANGUAGE
+    cat /etc/sysconfig/i18n
+    
+### 18.查看服务器所属时区和UTC时间
+
+    cat /etc/sysconfig/clock
+    
+### 19.查看服务器主机名
+
+    hostname
+    cat /etc/sysconfig/network
+    
+## CentOS挂载新硬盘                                        
+参考：http://blog.sina.com.cn/s/blog_6177e8400101ntvu.html 
+1.查看当前硬盘使用状况：
+
+    df -h
+2.查看新硬盘
+ 
+    fdisk -l 
+新添加的硬盘的编号为 `/dev/xvdb    /dev/xvde  /dev/vdb`
+
+3.硬盘分区   
+ 1)进入fdisk模式     
+    `/sbin/fdisk /dev/vdb`  
+ 2)输入n进行分区  
+ 3)选择分区类型   
+ 
+  这里有两个选项：   
+- p: 主分区 linux上主分区最多能有4个    
+- e: 扩展分区 linux上扩展分区只能有1个，扩展分区创建后不能直接使用，还要在扩展分区上创建逻辑分区。     
+
+这里我选择的p。
+
+ 4)选择分区个数  
+ 可以选择4个分区，这里我只分成1个分区    
+ 5)设置柱面，这里选择默认值就可以  
+ 6)输入w，写入分区表，进行分区   
+ 
+4.格式化分区 
+
+将新分区格式化为ext4文件系统     
+1)如果创建的是主分区 
+`mkfs -t ext4  /dev/vdb1 `
+
+5.挂载硬盘  
+1)创建挂载点     
+在根目录下创建sqjr目录   
+`mkdir /server /sqjr `
+2)将/dev/vdb1挂载到/sqjr下    
+ `mount /dev/vdb1 /server  /sqjr`
+ 
+6.设置开机启动自动挂载    
+新创建的分区不能开机自动挂载，每次重启机器都要手动挂载。    
+设置开机自动挂载需要修改/etc/fstab文件    
+`vi /etc/fstab `    
+在文件的最后增加一行  
+`/dev/vdb1 /server ext4 defaults 1 2 `
+
+7.取消挂载 /dev/xvdb1   
+`umount /dev/vdb1`
+
+8.重启    
+`reboot -n `                        
+
+           
+    
         
