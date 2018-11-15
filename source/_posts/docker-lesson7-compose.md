@@ -1,5 +1,5 @@
 ---
-title: docker学习-第六课：三剑客之Docker Compose
+title: docker学习-第七课：三剑客之Docker Compose
 date: 2018-08-01 20:33:32
 categories: docker
 tags: docker-compose
