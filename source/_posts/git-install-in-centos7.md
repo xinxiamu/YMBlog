@@ -30,10 +30,10 @@ yum -y install zlib-devel curl-devel openssl-devel perl cpio expat-devel gettext
 
 ## 六、将git设置为默认路径，不然后面克隆时会报错
 >  ln -s /server/git/bin/ git-upload-pack /usr/bin/git-upload-pack
->   n -s /server/git/bin/git-receive-pack /usr/bin/git-receive-pack
+>  ln -s /server/git/bin/git-receive-pack /usr/bin/git-receive-pack
 
 ## 七、查看版本
-> git --version
+> git --version #两个横杆
 
 -----------------------------------------------------
 
