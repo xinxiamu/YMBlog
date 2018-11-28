@@ -71,5 +71,74 @@ redmine项目管理系统之所以强大并让大家喜欢，正是其插件化�
 
 地址：http://www.redmine.org/plugins/redmine_emojibutton
 
+## office文档查看插件
+
+地址：https://www.redmine.org/plugins/redmine_preview_office
+
+### 安装
+
+实验环境：
+系统：centos7 64位  
+redmine：3.4.6   
+ruby：2.3.6  
+rails：4.2.8
+
+#### 一.安装[libreoffice](https://www.libreoffice.org)
+
+libreoffice提供命令把word文档，excel文档转成pdf格式等。这里同时提供了一个思路，开发应用时候，文档格式转换可以采用它。
+
+下载下面安装包到服务器：
+
+    wget https://downloadarchive.documentfoundation.org/libreoffice/old/5.3.6.1/rpm/x86_64/LibreOffice_5.3.6.1_Linux_x86-64_rpm_sdk.tar.gz
+    wget https://downloadarchive.documentfoundation.org/libreoffice/old/5.3.6.1/rpm/x86_64/LibreOffice_5.3.6.1_Linux_x86-64_rpm_langpack_zh-CN.tar.gz
+    wget https://downloadarchive.documentfoundation.org/libreoffice/old/5.3.6.1/rpm/x86_64/LibreOffice_5.3.6.1_Linux_x86-64_rpm.tar.gz    
+
+    [root@iZwz9b0bqrkbhqd5lu2pwhZ LibreOffice]# ls
+    LibreOffice_6.1.3.2_Linux_x86-64_rpm                 LibreOffice_6.1.3.2_Linux_x86-64_rpm_sdk                  LibreOffice_6.1.3_Linux_x86-64_rpm_sdk.tar.gz
+    LibreOffice_6.1.3.2_Linux_x86-64_rpm_langpack_zh-CN  LibreOffice_6.1.3_Linux_x86-64_rpm_langpack_zh-CN.tar.gz  LibreOffice_6.1.3_Linux_x86-64_rpm.tar.gz
+
+解压上面安装包，解压后，里面都有目录`RPMS`,安装里面的rpm包即可：   
+
+    yum localinstall *.rpm
     
+很顺利的安装成功。    
+    
+下面检查libreoffice是否可用：    
+
+    把test.doc转换成html，保存在test目录
+    libreoffice6.0 --invisible --convert-to html --outdir ./test test.doc 
+
+彻底卸载libreoffice：    
+
+    yum  erase libreoffice\*
+ 
+#### 二.安装[redmine_preview_office](https://www.redmine.org/plugins/redmine_preview_office)插件
+ 
+进入redmine安装的根目录：   
+ 
+    # git clone https://github.com/HugoHasenbein/redmine_preview_office.git plugins/redmine_preview_office
+    # bundle exec rake redmine:plugins:migrate RAILS_ENV=production 
+
+然后重启redmine即可。如下图：  
+
+{%asset_img b-1.png%}  
+
+说明插件安装成功了。
+
+卸载插件：
+
+    [root@iZwz9b0bqrkbhqd5lu2pwhZ redmine-3.4.6]# bundle exec rake redmine:plugins:migrate NAME=redmine_preview_office VERSION=0 RAILS_ENV=production
+    Migrating redmine_preview_office (Redmine Preview Office)...
+    [root@iZwz9b0bqrkbhqd5lu2pwhZ redmine-3.4.6]# rm -rf plugins/redmine_preview_office/
+
+重启redmine即可。
+
+#### 三.直接浏览文档
+
+点开一个问题的word文档，很遗憾，没能成功显示……
+
+坑爹……待续
+
+
+   
         
