@@ -9,6 +9,10 @@ html转pdf工具wkhtmltopdf的使用记录……
 
 官网：https://wkhtmltopdf.org/
 
+使用文档：   
+https://wkhtmltopdf.org/usage/wkhtmltopdf.txt
+https://www.cnblogs.com/colder/p/5819197.html
+
 ## centos下安装环境
 
 1.依赖包安装： `yum install zlib fontconfig freetype libX11 libXext libXrender` 
@@ -28,5 +32,20 @@ linux：把字体{%asset_link simsun.ttc simsun.ttc%}添加到系统`usr/share/f
 
 参考：https://blog.csdn.net/churujianghu/article/details/75076255
 
-示例：     
-./wkhtmltopdf --page-height 5cm --page-width 7cm --margin-bottom 0cm --margin-top 0.1cm --margin-left 0.1cm --margin-right 0cm --disable-smart-shrinking   label.html label.html label.html label.pdf
+示例：   
+  
+    ./wkhtmltopdf --page-height 5cm --page-width 7cm --margin-bottom 0cm --margin-top 0.1cm --margin-left 0.1cm --margin-right 0cm --disable-smart-shrinking   label.html label.html label.html label.pdf
+
+## 页眉处理
+    
+样例1：
+    
+    wkhtmltopdf.exe --footer-left "cxmr(500)        制表日期：[date] [time]"  --footer-right "制表者： XC-TEST001        页次： [page]/[topage]"  --footer-line  orders-atn.html a.pdf
+
+样例2：
+
+    wkhtmltopdf.exe --footer-left "cxmr(500)        制表日期：[date] [time]"  --footer-right "制表者： XC-TEST001        页次： [page]/[topage]"  --footer-line --footer-font-size 8  --footer-spacing 5 orders-atn.html b.pdf
+    
+样例3：
+    
+    wkhtmltopdf.exe --footer-left "cxmr(500)        制表日期：[date] [time]"  --footer-right "制表者： XC-TEST001        页次： [page]/[topage]"  --footer-line --footer-font-size 8  --footer-spacing 5 orders-atn.html orders-atn.html orders-atn.html b.pdf    
