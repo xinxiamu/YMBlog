@@ -9,6 +9,9 @@ tags: centos常用命令
 
 以备查询使用……
 
+## 查看各种硬件信息
+
+https://blog.csdn.net/dream_broken/article/details/52883883
 
 ## 查看系统信息
 
