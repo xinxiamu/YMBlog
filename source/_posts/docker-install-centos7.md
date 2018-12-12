@@ -7,6 +7,7 @@ tags: centos-docker-install
 
 本文介绍docker在centos7系统上的安装。
 参考：https://docs.docker.com/engine/installation/linux/docker-ce/centos/#uninstall-old-versions
+参考中文：http://docs.docker-cn.com/engine/installation/linux/docker-ce/centos/#%E4%BB%8E%E8%BD%AF%E4%BB%B6%E5%8C%85%E8%BF%9B%E8%A1%8C%E5%AE%89%E8%A3%85
 
 ## 1. 卸载旧版本docker
 
@@ -81,11 +82,13 @@ tags: centos-docker-install
         $ yum list docker-ce --showduplicates | sort -r
         
         docker-ce.x86_64            17.09.ce-1.el7.centos             docker-ce-stable                     
-        
+
+第二列是版本号。        
 The contents of the list depend upon which repositories are enabled, and will be specific to your version of CentOS (indicated by the .el7 suffix on the version, in this example). Choose a specific version to install. The second column is the version string. You can use the entire version string, but you need to include at least to the first hyphen. The third column is the repository name, which indicates which repository the package is from and by extension its stability level. To install a specific version, append the version string to the package name and separate them by a hyphen (-).
 > Note: The version string is the package name plus the version up to the first hyphen. In the example above, the fully qualified package name is docker-ce-17.06.1.ce.
 
-    $ sudo yum install <FULLY-QUALIFIED-PACKAGE-NAME>
+    $ sudo yum install docker-ce-<VERSION>
+    如： sudo yum install docker-ce- 17.09.ce-1.el7.centos
     
 4.3 启动docker                 
     

@@ -115,6 +115,16 @@ EL是Red Hat Enterprise Linux的简写
 
 4.重置并启动Gitlab
 
+    sudo gitlab-ctl reconfigure
+    sudo gitlab-ctl start
+
+5.停止
+
+    sudo gitlab-ctl stop
+    
+6.重启
+
+    sudo gitlab-ctl restart    
         
     
    
