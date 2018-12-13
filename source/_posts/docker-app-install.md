@@ -65,6 +65,14 @@ imageID: mysql镜像ID
 
 参考：https://hub.docker.com/r/library/mysql/
 
+创建容器mysql实例，端口为：3306
+
+    docker run --name mysql-3306 -p 3306:3306 -v /server/mysql-3306/logs:/logs -v /server/mysql-3306/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:8.0.13 --port=3306  --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    
+查看配置参数列表：
+
+    docker run -it --rm mysql:tag --verbose --help    
+
 #### 查看容器启动情况
 
     [root@xr-server ~]# docker ps
