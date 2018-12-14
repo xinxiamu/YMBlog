@@ -21,6 +21,7 @@ docker仓库： [hub repo](https://hub.docker.com/)
 - http://www.runoob.com/docker/docker-install-redis.html
 
 
+
 ## 安装mysql-server
 
 仓库：https://hub.docker.com/r/library/mysql/
@@ -100,4 +101,6 @@ dev   etc			  lib64  mnt	root  srv   usr
 root@415c0167fb5a:/# 
 ```
     
+## 安装zabbix
+
 
