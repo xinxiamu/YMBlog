@@ -103,4 +103,83 @@ root@415c0167fb5a:/#
     
 ## 安装zabbix
 
+#### 启动一个mysql服务器实例
 
+    docker run --name zabbix-mysql-server  \
+    -e MYSQL_ROOT_PASSWORD="123456" \
+    -e MYSQL_USER="zabbix" \
+    -e MYSQL_PASSWORD="123456" \
+    -e MYSQL_DATABASE="zabbix" \
+    -p 3306:3306  \
+    -v /server/dockers/zabbix/mysql/logs:/logs \
+    -v /server/dockers/zabbix/mysql/data:/var/lib/mysql \
+    -d mysql:8.0.13 \
+    --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+       
+#### 启动Zabbix server实例，并关联这个实例到已创建的MySQL服务器实例
+
+    docker run  --name zabbix-server-mysql --hostname zabbix-server-mysql \
+    --link zabbix-mysql-server:mysql \
+    -e DB_SERVER_HOST="mysql" \
+    -e MYSQL_USER="zabbix" \
+    -e MYSQL_DATABASE="zabbix" \
+    -e MYSQL_PASSWORD="123456" \
+    -e MYSQL_ROOT_PASSWORD="123456" \
+    -v /etc/localtime:/etc/localtime:ro \
+    -v /server/dockers/zabbix/zabbix-server/alertscripts:/usr/lib/zabbix/alertscripts \
+    -v /server/dockers/zabbix/zabbix-server/externalscripts:/usr/lib/zabbix/externalscripts \
+    -p 10051:10051 \
+    -p 10050:10050 \
+    -d zabbix/zabbix-server-mysql:centos-4.0.2
+    
+    ------------------------------ 查看启动日志 ---------------
+    docker logs zabbix-server-mysql
+   
+
+_注意_：必须加上属性` -e MYSQL_ROOT_PASSWORD="123456"`,否则mysql的`zabbix`用户没有操作mysql数据库的权限。    
+
+>`--link`属性说明：   
+docker run --link可以用来链接2个容器，使得源容器（被链接的容器）和接收容器（主动去链接的容器）之间可以互相通信，并且接收容器可以获取源容器的一些数据，如源容器的环境变量。
+--link的格式：
+--link <name or id>:alias
+其中，name和id是源容器的name和id，alias是源容器在link下的别名。    
+
+#### 启动Zabbix web 接口，并将它与MySQL服务器实例和Zabbix server实例关联
+
+    docker run --name zabbix-web-nginx-mysql --hostname zabbix-web-nginx-mysql \
+    --link zabbix-mysql-server:mysql \
+    --link zabbix-server-mysql:zabbix-server \
+    -e DB_SERVER_HOST="mysql" \
+    -e MYSQL_ROOT_PASSWORD="123456" \
+    -e MYSQL_USER="zabbix" \
+    -e MYSQL_PASSWORD="123456" \
+    -e MYSQL_DATABASE="zabbix" \
+    -e ZBX_SERVER_HOST="zabbix-server" \
+    -e PHP_TZ="Asia/Shanghai" \
+    -p 8083:80 \
+    -d zabbix/zabbix-web-nginx-mysql:centos-4.0.1
+    
+    ------------------------------ 查看启动日志 ---------------
+    docker logs zabbix-web-nginx-mysql
+
+```text
+浏览器访问ip:8000查看
+默认登录
+username:Admin
+password:zabbix
+```
+  
+ _注意_ ：生产环境要做数据卷映射。以防止数据丢失。必须加上属性` -e MYSQL_ROOT_PASSWORD="123456"`,否则mysql的`zabbix`用户没有操作mysql数据库的权限。
+    
+####　启动zabbix-agent
+
+    docker run --name zabbix-agent --link zabbix-server-mysql:zabbix-server -d zabbix/zabbix-agent:centos-4.0.2 
+    
+最后需要在web端将，zabbix-agent添加到zabbix-server的host列表里面。    
+
+####  启动Zabbix Java gateway实例,并关联到zabbix-server  
+
+用于监控jvm/tomcat性能。   
+Zabbix监控Java应用程序的关键点在于：配置Zabbix-JavaGateway、让Zabbix-Server能够连接Zabbix-JavaGateway、Tomcat开启JVM远程监控功能等。
+
+    docker run --name zabbix-java-gateway --link zabbix-server-mysql:zabbix-server -d zabbix/zabbix-java-gateway:latest
