@@ -113,7 +113,7 @@ root@415c0167fb5a:/#
     -p 3306:3306  \
     -v /server/dockers/zabbix/mysql/logs:/logs \
     -v /server/dockers/zabbix/mysql/data:/var/lib/mysql \
-    -d mysql:8.0.13 \
+    -d mysql:5.7 \
     --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
        
 #### 启动Zabbix server实例，并关联这个实例到已创建的MySQL服务器实例
@@ -163,13 +163,17 @@ docker run --link可以用来链接2个容器，使得源容器（被链接的�
     docker logs zabbix-web-nginx-mysql
 
 ```text
-浏览器访问ip:8000查看
+浏览器访问ip:8083查看
 默认登录
 username:Admin
 password:zabbix
 ```
   
  _注意_ ：生产环境要做数据卷映射。以防止数据丢失。必须加上属性` -e MYSQL_ROOT_PASSWORD="123456"`,否则mysql的`zabbix`用户没有操作mysql数据库的权限。
+ 
+ - 界面无法选择中文显示的问题：
+ 
+ https://www.jianshu.com/p/d0c0140ce9e9
     
 ####　启动zabbix-agent
 
