@@ -171,15 +171,36 @@ password:zabbix
   
  _注意_ ：生产环境要做数据卷映射。以防止数据丢失。必须加上属性` -e MYSQL_ROOT_PASSWORD="123456"`,否则mysql的`zabbix`用户没有操作mysql数据库的权限。
  
- - 界面无法选择中文显示的问题：
+_界面无法选择中文显示的问题_：
+
+打开系统，在用户资料中，可以选择语言，但是无法选择中文。这是由于docker容器没有安装中文字符集，不支持中文。   
+因此，要进入容器，安装中文字符集合： 
+
+查看系统当前字符集： `# locale`；     
+查看系统可用字符集： `#locale -a`;     
+安装中文字符集：  
+`yum install kde-l10n-Chinese -y `
+`yum -y -q reinstall glibc-common`
  
- https://www.jianshu.com/p/d0c0140ce9e9
-    
-####　启动zabbix-agent
+
+修改`vim /etc/locale.conf`, LANG=zh_CN.UTF-8;
+
+重新启动容器。再次进入容器，查看系统当前字符集，发现上面修改无效。坑爹……
+
+那是因为centos默认镜像的 /etc/yum.conf 里面有一句`override_install_langs=en_US.utf8`，    
+删除这句话，然后重新运行：`yum -y -q reinstall glibc-common`，再重启容器，查看系统当前字符集，可以看到是中文的了。
+ 
+ 
+       
+#### 启动zabbix-agent
+
+
 
     docker run --name zabbix-agent --link zabbix-server-mysql:zabbix-server -d zabbix/zabbix-agent:centos-4.0.2 
     
 最后需要在web端将，zabbix-agent添加到zabbix-server的host列表里面。    
+
+
 
 ####  启动Zabbix Java gateway实例,并关联到zabbix-server  
 
@@ -187,3 +208,42 @@ password:zabbix
 Zabbix监控Java应用程序的关键点在于：配置Zabbix-JavaGateway、让Zabbix-Server能够连接Zabbix-JavaGateway、Tomcat开启JVM远程监控功能等。
 
     docker run --name zabbix-java-gateway --link zabbix-server-mysql:zabbix-server -d zabbix/zabbix-java-gateway:latest
+    
+
+## 安装Jenkins
+
+####　配置日志：   
+
+    [root@ymu /]# mkdir -p /server/data/jenkins
+    [root@ymu /]# cd /server/data/jenkins
+    [root@ymu jenkins]# touch log.properties
+    [root@ymu jenkins]# cat > log.properties <<EOF
+    > handlers=java.util.logging.ConsoleHandler
+    > jenkins.level=FINEST
+    > java.util.logging.ConsoleHandler.level=FINEST
+    > EOF
+
+
+#### 启动jenkins服务
+
+    docker run --name ymu-jenkins -p 3001:8080 -p 50000:50000 --env JAVA_OPTS="-Djava.util.logging.config.file=/var/jenkins_home/log.properties" -v /server/data/jenkins:/var/jenkins_home -d jenkins:latest
+    
+说明： 
+- -v 会把容器目录`/var/jenkins_home`映射到主机`/server/data/jenkins` 
+
+
+#### 测试是否安装成功
+
+打开浏览器输入：local:3001
+
+如果看到要求获取登录密码的界面，则成功。恭喜……
+
+获取登录初始密码：   
+
+    [root@ymu secrets]# pwd
+    /server/data/jenkins/secrets
+    [root@ymu secrets]# cat initialAdminPassword 
+    8ccac67d98dd4c77a2c09870e8246e5d
+    [root@ymu secrets]#
+
+其它的如和maven的集成等，参考以前文档。  
