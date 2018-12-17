@@ -226,6 +226,19 @@ Zabbix监控Java应用程序的关键点在于：配置Zabbix-JavaGateway、让Z
 
 #### 启动jenkins服务
 
+首先，要对文件夹赋予权限：   
+查看文件夹权限：`
+
+    [root@xr-server jenkins]# ls -l /server/data/jenkins/
+    total 4
+    -rw-r--r--. 1 root root 109 Dec 17 00:55 log.properties
+    
+赋予文件夹权限：    
+
+    chown -R 1000:1000 /server/data/jenkins/    
+
+启动容器：
+
     docker run --name ymu-jenkins -p 3001:8080 -p 50000:50000 --env JAVA_OPTS="-Djava.util.logging.config.file=/var/jenkins_home/log.properties" -v /server/data/jenkins:/var/jenkins_home -d jenkins:latest
     
 说明： 
