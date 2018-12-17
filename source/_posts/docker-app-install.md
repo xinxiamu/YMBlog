@@ -260,3 +260,10 @@ Zabbix监控Java应用程序的关键点在于：配置Zabbix-JavaGateway、让Z
     [root@ymu secrets]#
 
 其它的如和maven的集成等，参考以前文档。  
+
+## 安装gitlab
+
+参考网址：https://docs.gitlab.com/omnibus/docker/
+
+
+
