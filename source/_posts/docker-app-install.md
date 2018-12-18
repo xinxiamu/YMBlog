@@ -261,6 +261,82 @@ Zabbix监控Java应用程序的关键点在于：配置Zabbix-JavaGateway、让Z
 
 其它的如和maven的集成等，参考以前文档。  
 
+#### 使用Nginx做方向代理
+
+坑，坑，坑……
+
+一开始按一般的nginx方向代理配置，负载均衡配置，都不行，页面打开异常的慢……
+
+各种百度，不行。还好，想起了google大神……结果找到了：  
+
+https://wiki.jenkins.io/display/JENKINS/Running+Jenkins+behind+Nginx
+
+还是官方文档有用，以后遇到这种问题，都先到官方wiki上找答案才对。  
+重新配置：
+
+    upstream jenkins {
+      keepalive 32; # keepalive connections
+      server 127.0.0.1:9000; # jenkins ip and port
+    }
+     
+    server {
+      listen          80;       # Listen on port 80 for IPv4 requests
+    
+      server_name     ci.xcsqjr.com;
+    
+      #this is the jenkins web root directory (mentioned in the /etc/default/jenkins file)
+      root            /server/data/jenkins/war;
+    
+      access_log      /server/java/nginx/logs/ci.xcsqjr.com.access.log;
+      error_log       /server/java/nginx/logs/ci.xcsqjr.com.error.log;
+      ignore_invalid_headers off; #pass through headers from Jenkins which are considered invalid by Nginx server.
+    
+      location ~ "^/static/[0-9a-fA-F]{8}\/(.*)$" {
+        #rewrite all static files into requests to the root
+        #E.g /static/12345678/css/something.css will become /css/something.css
+        rewrite "^/static/[0-9a-fA-F]{8}\/(.*)" /$1 last;
+      }
+    
+      location /userContent {
+        #have nginx handle all the static requests to the userContent folder files
+        #note : This is the $JENKINS_HOME dir
+        root /server/data/jenkins/war;
+        if (!-f $request_filename){
+          #this file does not exist, might be a directory or a /**view** url
+          rewrite (.*) /$1 last;
+    	  break;
+        }
+    	sendfile on;
+      }
+    
+      location / {
+          sendfile off;
+          proxy_pass         http://jenkins;
+          proxy_redirect     default;
+          proxy_http_version 1.1;
+    
+          proxy_set_header   Host              $host;
+          proxy_set_header   X-Real-IP         $remote_addr;
+          proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+          proxy_set_header   X-Forwarded-Proto $scheme;
+          proxy_max_temp_file_size 0;
+    
+          #this is the maximum upload size
+          client_max_body_size       10m;
+          client_body_buffer_size    128k;
+    
+          proxy_connect_timeout      90;
+          proxy_send_timeout         90;
+          proxy_read_timeout         90;
+          proxy_buffering            off;
+          #proxy_request_buffering    off; # Required for HTTP CLI commands in Jenkins > 2.54
+          proxy_set_header Connection ""; # Clear for keepalive
+      }
+    
+    }
+
+注意：按上面docker安装jenkins的时候，映射了数据卷，所以可以知道：`server/data/jenkins/war` 为jenkins的web根目录。注意配置好。
+
 ## 安装gitlab
 
 参考网址：https://docs.gitlab.com/omnibus/docker/
