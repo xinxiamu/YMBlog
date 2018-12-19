@@ -157,7 +157,7 @@ docker run --link可以用来链接2个容器，使得源容器（被链接的�
     -e ZBX_SERVER_HOST="zabbix-server" \
     -e PHP_TZ="Asia/Shanghai" \
     -p 8083:80 \
-    -d zabbix/zabbix-web-nginx-mysql:centos-4.0.1
+    -d zabbix/zabbix-web-nginx-mysql:centos-4.0.2
     
     ------------------------------ 查看启动日志 ---------------
     docker logs zabbix-web-nginx-mysql
