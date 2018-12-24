@@ -34,6 +34,28 @@ docker仓库： [hub repo](https://hub.docker.com/)
 
     docker run -p 3306:3306 --name mymysql -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:8.0.13    
 
+    ------------------------------------
+    docker run --name mysql-3910 -p 3910:3910 --privileged=true -v /server/data/mysql-3910/conf:/etc/mysql/conf.d -v /server/data/mysql-3910/logs:/logs -v /server/data/mysql-3910/data:/var/lib/mysql -e 
+    MYSQL_ROOT_PASSWORD=123456 --default-authentication-plugin=mysql_native_password -d mysql:8.0.13 
+
+
+my.cnf内容
+
+    [mysqld] 
+    port = 3910
+    character-set-client-handshake = FALSE 
+    character-set-server = utf8mb4 
+    collation-server = utf8mb4_unicode_ci
+    init_connect='SET NAMES utf8mb4'
+    default_authentication_plugin = mysql_native_password
+    
+    [client]
+    default-character-set=utf8mb4
+    
+    [mysql]
+    default-character-set=utf8mb4
+
+    
 命令说明：
 
 - -p 3306:3306：将容器的 3306 端口映射到主机的 3306 端口。
@@ -41,6 +63,8 @@ docker仓库： [hub repo](https://hub.docker.com/)
 - -v $PWD/logs:/logs：将主机当前目录下的 logs 目录挂载到容器的 /logs。
 - -v $PWD/data:/var/lib/mysql ：将主机当前目录下的data目录挂载到容器的 /var/lib/mysql 。
 - -e MYSQL_ROOT_PASSWORD=123456：初始化 root 用户的密码。
+- --default-authentication-plugin=mysql_native_password  加上这个客户端才能登录上。
+-  --privileged=true 提升root在docker中的权限，否则只是普通用户
 
 ```text
 补充：     
