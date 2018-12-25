@@ -7,7 +7,7 @@ tags: centos-docker-install
 
 本文介绍docker在centos7系统上的安装。
 参考：https://docs.docker.com/engine/installation/linux/docker-ce/centos/#uninstall-old-versions
-参考中文：http://docs.docker-cn.com/engine/installation/linux/docker-ce/centos/#%E4%BB%8E%E8%BD%AF%E4%BB%B6%E5%8C%85%E8%BF%9B%E8%A1%8C%E5%AE%89%E8%A3%85
+参考中文：http://docs.docker-cn.com/engine/installation/linux/docker-ce/centos/#%E4%BD%BF%E7%94%A8%E9%95%9C%E5%83%8F%E4%BB%93%E5%BA%93%E8%BF%9B%E8%A1%8C%E5%AE%89%E8%A3%85
 
 ## 1. 卸载旧版本docker
 
