@@ -1,5 +1,5 @@
 ---
-title: docker安装各种应用软件
+title: docker安装各种常用开发应用软件
 date: 2018-07-19 15:49:39
 categories: docker
 tags: docker安装应用
@@ -20,7 +20,108 @@ docker仓库： [hub repo](https://hub.docker.com/)
 参考：
 - http://www.runoob.com/docker/docker-install-redis.html
 
+### 使用redis镜像
 
+#### 不使用自定义配置文件：
+ 
+ 
+    docker run -p 6379:6379 --name redis-6379 --restart=always -v /server/data/redis-6379/data:/data  -d redis:5.0.3 redis-server --appendonly yes --requirepass "a1234567"
+
+```text
+命令说明：
+-p 6379:6379 : 将容器的6379端口映射到主机的6379端口
+-v /server/data/redis-6379/data:/data : 将主机中/server/data/redis-6379目录下的data挂载到容器的/data
+redis-server --appendonly yes : 在容器执行redis-server启动命令，并打开redis持久化配置 
+--requirepass "a1234567" : 设置认证密码 
+--restart=always ： 随docker启动而启动
+```
+
+通过客户端连接进入redis-ci：
+
+    [root@sqjr-client-demo-server1-hn ~]# docker exec -it redis-6379 redis-cli -a a1234567
+    Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+    127.0.0.1:6379> set username zmt
+
+在宿主机查看redis进程：
+
+    [root@sqjr-client-demo-server1-hn ~]# ps -ef|grep redis
+    polkitd  29683 29651  0 14:27 ?        00:00:01 redis-server *:6379
+    root     29935 29453  0 14:51 pts/1    00:00:00 grep --color=auto redis
+
+只能本机127.0.0.1连接，不能远程连接。默认是保护模式，不允许远程连接。
+
+#### 使用自定义配置文件（推荐）
+
+
+     docker run --name redis-6380 -p 6380:6380 --restart=always -v /server/data/redis-6380/data:/data -v /server/data/redis-6380/conf/redis.conf:/usr/local/etc/redis/redis.conf -d redis redis-server  /usr/local/etc/redis/redis.conf --appendonly yes
+     
+redis.conf配置文件基本内容，自由添加：
+    
+    # 指定Redis监听端口，默认端口为6379
+    # 如果指定0端口，表示Redis不监听TCP连接
+    port 6380
+    
+    #设置密码
+    requirepass a1234567
+    
+    #### 生产环境要开启保护模式
+    # 绑定的主机地址
+    # 你可以绑定单一接口，如果没有绑定，所有接口都会监听到来的连接
+    # bind 127.0.0.1
+    
+    #protected-mode yes #关闭，不要保护模式，远程可连接
+    
+    # 当客户端闲置多长时间后关闭连接，如果指定为0，表示关闭该功能
+    timeout 0
+    
+    #一定要打开，否则无法启动
+    #daemonize yes
+    
+    # 当Redis以守护进程方式运行时，Redis默认会把pid写入/var/run/redis.pid文件，可以通过pidfile指定
+    pidfile /var/run/redis.pid
+    
+    # 指定日志记录级别，Redis总共支持四个级别：debug、verbose、notice、warning，默认为verbose
+    # debug (很多信息, 对开发／测试比较有用)
+    # verbose (many rarely useful info, but not a mess like the debug level)
+    # notice (moderately verbose, what you want in production probably)
+    # warning (only very important / critical messages are logged)
+    loglevel verbose
+    
+    # 日志记录方式，默认为标准输出，如果配置为redis为守护进程方式运行，而这里又配置为标准输出，则日志将会发送给/dev/null
+    logfile stdout
+    
+    # 设置数据库的数量，默认数据库为0，可以使用select <dbid>命令在连接上指定数据库id
+    # dbid是从0到‘databases’-1的数目
+    databases 16
+    
+    ################################ SNAPSHOTTING  #################################
+    # 指定在多长时间内，有多少次更新操作，就将数据同步到数据文件，可以多个条件配合
+    # Save the DB on disk:
+    #
+    #   save <seconds> <changes>
+    #
+    #   Will save the DB if both the given number of seconds and the given
+    #   number of write operations against the DB occurred.
+    #
+    #   满足以下条件将会同步数据:
+    #   900秒（15分钟）内有1个更改
+    #   300秒（5分钟）内有10个更改
+    #   60秒内有10000个更改
+    #   Note: 可以把所有“save”行注释掉，这样就取消同步操作了
+    
+    save 900 1
+    save 300 10
+    save 60 10000
+    
+    # 指定存储至本地数据库时是否压缩数据，默认为yes，Redis采用LZF压缩，如果为了节省CPU时间，可以关闭该选项，但会导致数据库文件变的巨大
+    rdbcompression yes
+    
+    # 指定本地数据库文件名，默认值为dump.rdb
+    dbfilename dump.rdb         
+    
+*注意*:   
+切记注释掉：#daemonize yes 否则无法启动容器
+重要话说三遍：注释掉#daemonize yes，注释掉#daemonize yes，注释掉#daemonize yes
 
 ## 安装mysql-server
 
