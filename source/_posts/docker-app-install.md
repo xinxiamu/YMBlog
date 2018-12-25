@@ -493,6 +493,8 @@ https://wiki.jenkins.io/display/JENKINS/Running+Jenkins+behind+Nginx
 
     admin / admin123        
 
+4.浏览器浏览：
 
+    http://119.145.41.171:8084/nexus
 
 
