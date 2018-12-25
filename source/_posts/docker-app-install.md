@@ -475,5 +475,24 @@ https://wiki.jenkins.io/display/JENKINS/Running+Jenkins+behind+Nginx
 
 参考网址：https://docs.gitlab.com/omnibus/docker/
 
+## 安装sonatype/nexus
+
+参考网址：https://hub.docker.com/r/sonatype/nexus
+
+1.初始持久化数据目录
+
+    # mkdir /server/data/nexus/data && chown -R 200 /server/data/nexus/data
+    
+    # docker run -d -p 8084:8081 --name nexus -e MAX_HEAP=768m  -v /server/data/nexus/data:/sonatype-work sonatype/nexus    
+    
+2.查看启动日志
+
+    docker logs -f nexus
+    
+3.默认账号密码：
+
+    admin / admin123        
+
+
 
 

@@ -342,5 +342,28 @@ https://blog.csdn.net/dream_broken/article/details/52883883
 `reboot -n `                        
 
            
+## 清理缓存，释放内存
+
+1.清理yum缓存使用yum clean 命令，yum clean 的参数有headers, packages, metadata, dbcache, plugins, expire-cache, rpmdb, all
+
+    yum clean headers  #清理/var/cache/yum的headers
+    yum clean packages #清理/var/cache/yum下的软件包
+    yum clean metadata
+    ...
     
         
+2.Linux释放内存
+
+释放网页缓存(To free pagecache):    
+
+    sync; echo 1 > /proc/sys/vm/drop_caches
+    
+释放目录项和索引(To free dentries and inodes):
+
+    sync; echo 2 > /proc/sys/vm/drop_caches
+    
+释放网页缓存，目录项和索引（To free pagecache, dentries and inodes）:
+
+    sync; echo 3 > /proc/sys/vm/drop_caches 
+    
+               
