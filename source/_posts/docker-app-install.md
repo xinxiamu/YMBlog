@@ -32,10 +32,13 @@ docker仓库： [hub repo](https://hub.docker.com/)
     
 #### 使用mysql镜像
 
+- 自定义配置文件
+
+
     docker run -p 3306:3306 --name mymysql -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:8.0.13    
 
     ------------------------------------
-    docker run --name mysql-3910 -p 3910:3910 --privileged=true -v /server/data/mysql-3910/conf:/etc/mysql/conf.d -v /server/data/mysql-3910/logs:/logs -v /server/data/mysql-3910/data:/var/lib/mysql -e 
+    docker run --name mysql-3910 -p 3910:3910 --restart always --privileged=true -v /server/data/mysql-3910/conf:/etc/mysql/conf.d -v /server/data/mysql-3910/logs:/logs -v /server/data/mysql-3910/data:/var/lib/mysql -e 
     MYSQL_ROOT_PASSWORD=123456 --default-authentication-plugin=mysql_native_password -d mysql:8.0.13 
 
 
@@ -63,8 +66,9 @@ my.cnf内容
 - -v $PWD/logs:/logs：将主机当前目录下的 logs 目录挂载到容器的 /logs。
 - -v $PWD/data:/var/lib/mysql ：将主机当前目录下的data目录挂载到容器的 /var/lib/mysql 。
 - -e MYSQL_ROOT_PASSWORD=123456：初始化 root 用户的密码。
-- --default-authentication-plugin=mysql_native_password  加上这个客户端才能登录上。
+- --default-authentication-plugin=mysql_native_password  加上这个客户端才能登录上。在配置文件加了，命令中可已不加。
 -  --privileged=true 提升root在docker中的权限，否则只是普通用户
+- –restart always：开机启动
 
 ```text
 补充：     
@@ -86,7 +90,7 @@ MySQL默认配置文件是 /etc/mysql/my.cnf 文件。如果想要自定义配�
 -d: 后台运行容器，并返回容器ID
 imageID: mysql镜像ID
 ```
-*不使用conf配置文件*:
+- 不使用conf配置文件
 
 参考：https://hub.docker.com/r/library/mysql/
 
