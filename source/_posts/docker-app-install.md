@@ -506,7 +506,7 @@ https://hub.docker.com/r/sonatype/nexus
 
     # mkdir -p /server/data/nexus3-data && chown -R 200 /server/data/nexus3-data
     
-    # docker run  -p 8085:8081 --name nexus3 --restart=always -v /server/data/nexus3-data:/nexus-data  -d sonatype/nexus3
+    # docker run  -p 8085:8081 -p 8082:8082 -p 8083:8083 --name nexus3 --restart=always -v /server/data/nexus3-data:/nexus-data  -d sonatype/nexus3
 
 2.查看启动日志：
 
