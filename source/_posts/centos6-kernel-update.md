@@ -5,6 +5,9 @@ categories: CentOs
 tags:
 ---
 
+本章介绍linux系统升级内核的方法，在centos6环境下实验通过，并安装docker成功。     
+如果不升级内核，安装docker，性能会收到影响。   
+
 1.查看当前内核版本： 
 
     [root@iZwz9b0bqrkbhqd5lu2pwhZ ~]# uname -a

@@ -477,7 +477,8 @@ https://wiki.jenkins.io/display/JENKINS/Running+Jenkins+behind+Nginx
 
 ## 安装sonatype/nexus
 
-参考网址：https://hub.docker.com/r/sonatype/nexus
+参考网址：   
+https://hub.docker.com/r/sonatype/nexus 
 
 1.初始持久化数据目录
 
@@ -495,6 +496,28 @@ https://wiki.jenkins.io/display/JENKINS/Running+Jenkins+behind+Nginx
 
 4.浏览器浏览：
 
-    http://119.145.41.171:8084/nexus
+    http://ip:8084/nexus
 
+### 安装sonatype/nexus3,兼容maven依赖和docker register（推荐生产使用）
 
+网址：https://github.com/sonatype/docker-nexus3
+
+1.创建映射卷并启动实例
+
+    # mkdir -p /server/data/nexus3-data && chown -R 200 /server/data/nexus3-data
+    
+    # docker run  -p 8085:8081 --name nexus3 --restart=always -v /server/data/nexus3-data:/nexus-data  -d sonatype/nexus3
+
+2.查看启动日志：
+
+    docker logs -f nexus    
+    
+3.测试是否安装成功：
+
+    curl -u admin:admin123 http://localhost:8085/service/metrics/ping  
+    
+4.打开浏览器浏览：
+
+ 网址：http://ip:8085
+ 
+ 默认账号密码：admin admin123

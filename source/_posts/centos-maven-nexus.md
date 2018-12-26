@@ -1,8 +1,8 @@
 ---
 title: centos7下搭建maven私仓Nexus
 date: 2017-11-12 14:47:38
-categories: CentOs
-tags: centos-nexus
+categories: 私仓Nexus
+tags: 
 ---
 
 项目组件化，共用jar包，统一获取墙外jar包…… 

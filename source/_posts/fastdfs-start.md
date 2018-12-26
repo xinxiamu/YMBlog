@@ -2,7 +2,7 @@
 title: fastdfs-分布式文件系统安装使用
 date: 2018-02-01 10:51:36
 categories: 文件存储系统
-tags: fastdfs-安装使用
+tags: 
 ---
 
 本文记录FastDFS分布式文件系统的在服务器的搭建，配置以及使用……
