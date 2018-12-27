@@ -36,11 +36,11 @@ tags:
     [root@api data]# cat /etc/docker/daemon.json 
     {
       "insecure-registries" : [
-        "119.145.41.171:8082"
+        "11.148.41.11:8082"
       ]
     }
     
-`119.145.41.171:8082`：这里ip是nexus服务器的ip，端口是是上面配置的docker仓库的端口。
+`11.148.41.11:8082`：这里ip是nexus服务器的ip，端口是是上面配置的docker仓库的端口。
 
 然后重启docker引擎。
 
