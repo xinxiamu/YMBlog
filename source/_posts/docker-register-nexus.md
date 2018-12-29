@@ -47,7 +47,7 @@ tags:
 - 登录
 
 
-    docker login -u admin -p admin123 172.16.77.71:8082  #注意这里的端口是配置仓库时选择的端口号
+    docker login -u admin -p admin123 ip:8082  #注意这里的端口是配置仓库时选择的端口号
     
 ## 上传镜像
 
@@ -55,11 +55,11 @@ tags:
 
 所以要先改镜像标签：
 
-    docker tag nginx:latest 172.16.77.71:8082/nginx:0.1
+    docker tag nginx:latest ip:8082/nginx:0.1
     
 然后上传：
     
-    docker push 172.16.77.71:8082/nginx:0.1
+    docker push ip:8082/nginx:0.1
     
 下面成功截图：
 
@@ -67,10 +67,10 @@ tags:
 
 ## 拉取镜像
 
-    docker pull 172.16.77.71:8082/nginx:0.1
+    docker pull ip:8082/nginx:0.1
     
 ## 搜索镜像
 
-    docker search 172.16.77.71:8082/nginx      
+    docker search ip:8082/nginx      
     
     

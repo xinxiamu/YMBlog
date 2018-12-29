@@ -52,6 +52,12 @@ https://blog.csdn.net/aixiaoyang168/article/details/77453974
 编辑/etc/profile文件，增加环境变量：
     
     export DOCKER_HOST=tcp://192.168.33.10:2375
+    
+可能报错：
+    
+    [ERROR] Failed to execute goal com.spotify:docker-maven-plugin:1.2.0:build (default-cli) on project demo: Exception caught: java.util.concurrent.ExecutionException: com.spotify.docker.client.shaded.javax.ws.rs.ProcessingException: com.spotify.docker.client.shaded.org.apache.http.conn.HttpHostConnectException: Connect to 192.168.33.10:2375 [/192.168.33.10] failed: Connection refused (Connection refused) -> [Help 1]
+
+报错的话，把跳过该步骤，后面也能成功。待解……    
 
 ip是指本机ip。端口指定，不可更改。
 
@@ -97,58 +103,108 @@ ip是指本机ip。端口指定，不可更改。
 
 ## 构建docker镜像并push到docker私服
 
+### 简洁配置：
 
+1.maven setting.xml配置：  
+添加：
 
+     <server>
+    	<id>my-docker-registry</id>
+    	<username>admin</username>
+    	<password>admin123</password>
+    	<configuration>
+    	   <email>932852117@qq.com</email>
+    	</configuration>
+      </server>
 
-        <plugin>
-            <groupId>com.spotify</groupId>
-            <artifactId>docker-maven-plugin</artifactId>
-            <version>0.4.13</version>
-            <configuration>
-                <imageName>http://119.145.41.171:8082/mavendemo:v1.0</imageName>
-                <baseImage>java</baseImage>
-                <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
-                <maintainer>docker_maven docker_maven@email.com</maintainer>
-                <workdir>/ROOT</workdir>
-                <cmd>["java", "-version"]</cmd>
-                <entryPoint>["java", "-jar", "${project.build.finalName}.jar"]</entryPoint>
-                <resources>
-                    <resource>
-                        <targetPath>/ROOT</targetPath>
-                        <directory>${project.build.directory}</directory>
-                        <include>${project.build.finalName}.jar</include>
-                    </resource>
-                </resources>
-                <serverId>my-docker-registry</serverId>
-            </configuration>
-            <executions>
-                <execution>
-                    <id>build-image</id>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>build</goal>
-                    </goals>
-                </execution>
-                <execution>
-                    <id>tag-image</id>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>tag</goal>
-                    </goals>
-                    <configuration>
-                        <image>mavendemo:${project.version}</image>
-                        <newName>http://119.145.41.171:8082/mavendemo:v1.0</newName>
-                    </configuration>
-                </execution>
-                <execution>
-                    <id>push-image</id>
-                    <phase>deploy</phase>
-                    <goals>
-                        <goal>push</goal>
-                    </goals>
-                    <configuration>
-                        <imageName>http://119.145.41.171:8082/mavendemo:v.10</imageName>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
+账号密码，是私服nexus的账号密码。
+
+2.pom.xml配置：
+
+    <plugin>
+        <groupId>com.spotify</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <version>1.2.0</version>
+        <configuration>
+            <imageName>119.145.41.171:8082/ymu-micr/my-image:${project.version}</imageName>
+            <!-- <imageName>my-image:${project.version}</imageName> -->
+            <baseImage>anapsix/alpine-java</baseImage>
+            <entryPoint>["java", "-jar", "/${project.build.finalName}.jar"]</entryPoint> 
+            <forceTags>true</forceTags>
+            <!-- copy the service's jar file from target into the root directory 
+                of the image -->
+            <resources>
+                <resource>
+                    <targetPath>/</targetPath>
+                    <directory>${project.build.directory}</directory>
+                    <include>${project.build.finalName}.jar</include>
+                </resource>
+            </resources>
+            <serverId>my-docker-registry</serverId>
+            <!-- <registryUrl>119.145.41.171:8082/v1/</registryUrl> -->
+        </configuration>
+    </plugin>
+    
+3.执行命令构建上传到nexus私服：
+
+    mvn clean package docker:build -DpushImage    
+    
+构建成功后可以在私服看到docker 镜像：
+
+{%asset_img a-1.png%}        
+
+###　完整配置：   
+
+    <plugin>
+        <groupId>com.spotify</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <version>1.2.0</version>
+        <configuration>
+            <imageName>119.145.41.171:8082/ymu-micr/my-image:${project.version}</imageName>
+            <!-- <imageName>my-image:${project.version}</imageName> -->
+            <baseImage>anapsix/alpine-java</baseImage>
+            <entryPoint>["java", "-jar", "/${project.build.finalName}.jar"]</entryPoint> 
+            <forceTags>true</forceTags>
+            <!-- copy the service's jar file from target into the root directory 
+                of the image -->
+            <resources>
+                <resource>
+                    <targetPath>/</targetPath>
+                    <directory>${project.build.directory}</directory>
+                    <include>${project.build.finalName}.jar</include>
+                </resource>
+            </resources>
+            <serverId>my-docker-registry</serverId>
+            <!-- <registryUrl>119.145.41.171:8082/v1/</registryUrl> -->
+        </configuration>
+        <executions>
+            <execution>
+              <id>build-image</id>
+              <phase>package</phase>
+              <goals>
+                <goal>build</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>tag-image</id>
+              <phase>package</phase>
+              <goals>
+                <goal>tag</goal>
+              </goals>
+              <configuration>
+                <image>my-image:${project.version}</image>
+                <newName>119.145.41.171:8082/ymu-micr/my-image:${project.version}</newName>
+              </configuration>
+            </execution>
+            <execution>
+              <id>push-image</id>
+              <phase>deploy</phase>
+              <goals>
+                <goal>push</goal>
+              </goals>
+              <configuration>
+                <imageName>119.145.41.171:8082/ymu-micr/my-image:${project.version}</imageName>
+              </configuration>
+            </execution>        
+        </executions>
+    </plugin>
