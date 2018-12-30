@@ -151,9 +151,10 @@ ip是指本机ip。端口指定，不可更改。
     
 构建成功后可以在私服看到docker 镜像：
 
-{%asset_img a-1.png%}        
+{%asset_img a-1.png%}   
+     
 
-###　完整配置：   
+### 完整配置：   
 
     <plugin>
         <groupId>com.spotify</groupId>
