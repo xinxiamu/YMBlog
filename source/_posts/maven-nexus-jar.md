@@ -105,9 +105,53 @@ tags:
 
 看Group组，我们可以看到Member里面有很多个仓库，这代表，拉取jar构件的时候，首先从私服本机拉取，拉取不到的话再从下一个拉取，按顺序处理。从maven中央仓库拉取的jar构件都会缓存到其它仓库。  
 
-以上，我们看到的配置在pom.xml中，只针对某个项目有效。如果是多个项目想都通用私服，则可以在maven的setting.xml中配置，这里不做介绍。个人更喜欢在pom.xml配置，放到父pom中。
+以上，我们看到的配置在pom.xml中，只针对某个项目有效。如果是多个项目想都通用私服，则可以在maven的setting.xml中配置:
+
+    <settings>
+      <mirrors>
+        <mirror>
+          <!--This sends everything else to /public -->
+          <id>nexus</id>
+          <mirrorOf>*</mirrorOf>
+          <url>http://localhost:8081/repository/maven-public/</url>
+        </mirror>
+      </mirrors>
+      <profiles>
+        <profile>
+          <id>nexus</id>
+          <!--Enable snapshots for the built in central repo to direct -->
+          <!--all requests to nexus via the mirror -->
+          <repositories>
+            <repository>
+              <id>central</id>
+              <url>http://central</url>
+              <releases><enabled>true</enabled></releases>
+              <snapshots><enabled>true</enabled></snapshots>
+            </repository>
+          </repositories>
+         <pluginRepositories>
+            <pluginRepository>
+              <id>central</id>
+              <url>http://central</url>
+              <releases><enabled>true</enabled></releases>
+              <snapshots><enabled>true</enabled></snapshots>
+            </pluginRepository>
+          </pluginRepositories>
+        </profile>
+      </profiles>
+      <activeProfiles>
+        <!--make the profile active all the time -->
+        <activeProfile>nexus</activeProfile>
+      </activeProfiles>
+    </settings>
+    
+这样子就可以全局引用了，所有项目都是从配置的私服以及其它第三方私服下载构件。不用在每个项目的pom.xml中配置了。  
+第三方的私服，可以添加proxy私仓，然后整合进去group里面。  
+
 
 ## 上传第三个jar包到nexus私服中
+
+### 方法一：在nexus3界面直接操作
 
 {%asset_img a-3.png%}
 
@@ -126,3 +170,16 @@ tags:
 {%asset_img a-6.png%}  
 
 下面就可以在pom.xml中正常的引用了。
+
+### 方法二：mvn命令直接操作
+
+    mvn deploy:deploy-file -DgroupId=com.csource -DartifactId=fastdfs-client-java -Dversion=1.27-RELEASE -Dpackaging=jar -Dfile=/home/mutian/Desktop/fastdfs-client-java-1.27-RELEASE.jar -Durl=http://119.145.41.171:8085/repository/ymu-hosted/ -DrepositoryId=repository
+    
+参数说明：   
+- -Durl: 仓库地址，jar包要上传到这个自己设定的本机仓库下面。
+- -DrepositoryId：重要，这个是在maven配置文件setting.xml中设定的。对应该仓库的访问id。名字要一致。
+- -DgroupId=com.csource -DartifactId=fastdfs-client-java -Dversion=1.27-RELEASE 这三个参数根据你的jar包随便设。
+- -Dfile：要上传的jar包所在路径。
+
+
+  
