@@ -12,8 +12,170 @@ docker仓库： [hub repo](https://hub.docker.com/)
 ## 安装nginx
 
 参考：
-- http://www.runoob.com/docker/docker-install-redis.html
+- https://hub.docker.com/_/nginx
 
+1.新建要映射的卷
+
+    # mkdir -p /server/data/nginx/{cache,conf,conf.d,html,logs,pid}
+    # chown 1000 /server/data/nginx/* -R
+    # chmod 755 /server/data/nginx/* -R
+
+查看
+
+    [root@sqjr-client-demo-server1-hn nginx]# pwd
+    /server/data/nginx
+    [root@sqjr-client-demo-server1-hn nginx]# ls
+    cache  conf  conf.d  html  logs  pid    
+
+2.拉取nginx最新镜像
+
+    docker pull nginx
+    
+2.配置nginx.conf
+
+- 可以从从启动的容器中把该文件拷贝出来。
+
+
+    $ docker run --name tmp-nginx-container -d nginx
+    $ docker cp tmp-nginx-container:/etc/nginx/nginx.conf /server/data/nginx/conf/nginx.conf
+    $ docker rm -f tmp-nginx-container
+
+- 或者进入`/server/data/nginx/conf`,新建文件`touch nginx.conf`
+
+然后编辑nginx.conf文件：
+
+    user  nginx;
+    worker_processes  1;
+    
+    error_log  /var/log/nginx/error.log warn;
+    pid        /var/run/nginx.pid;
+    
+    
+    events {
+        worker_connections  1024;
+    }
+    
+    
+    http {
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+    
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" '
+                          '"$http_user_agent" "$http_x_forwarded_for"';
+    
+        access_log  /var/log/nginx/access.log  main;
+    
+        sendfile        on;
+        #tcp_nopush     on;
+    
+        keepalive_timeout  65;
+    
+        #gzip  on;
+    
+        server {
+            listen       80;
+            server_name  localhost;
+    	charset utf-8;
+    
+            #charset koi8-r;
+    
+            #access_log  logs/host.access.log  main;
+    
+            location / {
+                root   /usr/share/nginx/html;
+                #root /server/wwwroot;
+                index  index.html index.htm;
+            }
+    
+            #error_page  404              /404.html;
+    
+            # redirect server error pages to the static page /50x.html
+            #
+            error_page   500 502 503 504  /50x.html;
+            location = /50x.html {
+                root   html;
+            }
+    
+            # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+            #
+            #location ~ \.php$ {
+            #    proxy_pass   http://127.0.0.1;
+            #}
+    
+            # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+            #
+            #location ~ \.php$ {
+            #    root           html;
+            #    fastcgi_pass   127.0.0.1:9000;
+            #    fastcgi_index  index.php;
+            #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+            #    include        fastcgi_params;
+            #}
+    
+            # deny access to .htaccess files, if Apache's document root
+            # concurs with nginx's one
+            #
+            #location ~ /\.ht {
+            #    deny  all;
+            #}
+        }
+    
+        include /etc/nginx/conf.d/*.conf;
+    }
+
+3.新建欢迎页面
+
+进入目录`server/data/nginx/html`下，新建文件`index.html`并随便编写内容测试。
+
+4.启动nginx容器
+
+    docker run --name nginx -d -p 80:80 -v /server/data/nginx/html:/usr/share/nginx/html:ro -v /server/data/nginx/logs:/var/log/nginx -v /server/data/nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro -v /server/data/nginx/conf.d:/etc/nginx/conf.d -v /server/data/nginx/cache:/var/cache/nginx -v /server/data/nginx/pid:/var/run -d nginx
+    
+成功启动后，就可以打开浏览器测试：http://ip或者http://域名
+
+5.中文乱码问题
+
+如果发现中文乱码，修改server的配置内容，增加一行：charset utf-8;  
+
+      upstream you.domainName.com {
+         server 127.0.0.1:8081;
+      }
+     
+      server {
+            listen      80;
+            server_name  you.domainName.com;
+            charset utf-8;
+       
+            location /examples {
+                return 403;
+              }   
+       }
+      
+然后重启nginx。最后，在浏览器上Ctrl+F5，刷新，一切正常！
+
+6.反向代理失败问题
+
+    upstream abs-demo.xcsqjr.com{
+        ip_hash;
+        server localhost:8084;
+        #server 192.168.0.36:8084;
+        #server 192.168.0.196:8011;
+        #server 192.168.0.197:8011;
+    }
+    
+这里不成功，包404错误。8084的应用也是跑在docker上的。实际上并不是因为跑在docker上就失败。  
+成功配置：    
+    
+    upstream abs-demo.xcsqjr.com{
+            ip_hash;
+            #server localhost:8084;
+            server 192.168.0.36:8084;
+            #server 192.168.0.196:8011;
+            #server 192.168.0.197:8011;
+    }
+    
+不能用`localhost`或者`127.0.0.1`,要用内网ip。查询内网ip，执行命令：`ifconfig`。
 
 ## 安装redis
 
