@@ -76,9 +76,75 @@ https://spring.io/guides/gs/spring-boot-docker/
 
     $ ./mvnw install dockerfile:build
     
-        
-
+    或者
     
-
+    mvn install dockerfile:build
     
         
+## 上传到docker私服
+
+1.配置setting.xml
+
+    <server>
+      <id>ip:8082</id>
+      <username>admin</username>
+      <password>admin123</password>
+    </server>
+    
+注意id，必须为私服地址。
+
+
+2.配置pom.xml
+
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+        <!-- tag::plugin[] -->
+        <plugin>
+            <groupId>com.spotify</groupId>
+            <artifactId>dockerfile-maven-plugin</artifactId>
+            <version>1.4.9</version>
+            <configuration>
+                <repository>119.145.41.171:8082/${docker.image.prefix}/${project.artifactId}</repository>
+                <tag>${project.version}</tag>
+                <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+            </configuration>
+        </plugin>
+        <!-- end::plugin[] -->
+
+        <!-- tag::unpack[] -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>unpack</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>unpack</goal>
+                    </goals>
+                    <configuration>
+                        <artifactItems>
+                            <artifactItem>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>${project.artifactId}</artifactId>
+                                <version>${project.version}</version>
+                            </artifactItem>
+                        </artifactItems>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+        <!-- end::unpack[] -->
+    </plugins>
+    
+重点两个参数： 
+
+- repository：需要加上私服地址。
+- useMavenSettingsForAuth：设置为true。
+
+3.执行命令构建并上传镜像到私服
+
+    mvn clean install dockerfile:push       
