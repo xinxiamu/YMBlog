@@ -301,8 +301,7 @@ redis.conf配置文件基本内容，自由添加：
     docker run -p 3306:3306 --name mymysql -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:8.0.13    
 
     ------------------------------------
-    docker run --name mysql-3910 -p 3910:3910 --restart always --privileged=true -v /server/data/mysql-3910/conf:/etc/mysql/conf.d -v /server/data/mysql-3910/logs:/logs -v /server/data/mysql-3910/data:/var/lib/mysql -e 
-    MYSQL_ROOT_PASSWORD=123456 --default-authentication-plugin=mysql_native_password -d mysql:8.0.13 
+    docker run --name mysql-3910 -p 3910:3910 --restart always --privileged=true -v /server/data/mysql-3910/conf:/etc/mysql/conf.d -v /server/data/mysql-3910/logs:/logs -v /server/data/mysql-3910/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --default-authentication-plugin=mysql_native_password -d mysql:8.0.13 
 
 
 my.cnf内容
@@ -321,6 +320,31 @@ my.cnf内容
     [mysql]
     default-character-set=utf8mb4
 
+_注意_:   
+
+- 远程连接可能报错误：
+
+
+    2019-01-03T07:41:43.260661Z 8 [Warning] [MY-010055] [Server] IP address '172.17.0.1' could not be resolved: Name or service not known
+
+- 原因：    
+在网上查了些资料简单点说就是反向解析造成的，具体原因是因为“MYSQL Server在本地内存中维护了一个非本地的Client TCP cache，这个cache中包含了远程Client的登录信息，比如IP地址，hostname等信息。如果Client连接到服务器后，Mysql首先会在本地TCP池中根据IP地址解析客户端的hostname或者反解析，如果解析不到，就会去DNS中进行解析，如果还是解析失败就在error log中写入这样的警告信息。”。 
+    
+- 解决办法：        
+在配置文件新增一句`skip-name-resolve`： 
+ 
+
+    [mysqld] 
+    port = 3910
+    character-set-client-handshake = FALSE 
+    character-set-server = utf8mb4 
+    collation-server = utf8mb4_unicode_ci
+    init_connect='SET NAMES utf8mb4'
+    default_authentication_plugin = mysql_native_password
+    skip-name-resolve
+
+然后重启mysql服务再试。
+        
     
 命令说明：
 
@@ -329,7 +353,7 @@ my.cnf内容
 - -v $PWD/logs:/logs：将主机当前目录下的 logs 目录挂载到容器的 /logs。
 - -v $PWD/data:/var/lib/mysql ：将主机当前目录下的data目录挂载到容器的 /var/lib/mysql 。
 - -e MYSQL_ROOT_PASSWORD=123456：初始化 root 用户的密码。
-- --default-authentication-plugin=mysql_native_password  加上这个客户端才能登录上。在配置文件加了，命令中可已不加。
+- --default-authentication-plugin=mysql_native_password  加上这个客户端才能登录上。在配置文件加了，命令中可以不加。
 -  --privileged=true 提升root在docker中的权限，否则只是普通用户
 - –restart always：开机启动
 
@@ -683,3 +707,5 @@ https://hub.docker.com/r/sonatype/nexus
  网址：http://ip:8085
  
  默认账号密码：admin admin123
+ 
+ 

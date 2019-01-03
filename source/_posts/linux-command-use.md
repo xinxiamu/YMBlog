@@ -208,3 +208,22 @@ cp -r dir1 dir2
   8、`*.rar` 用 unrar e解压
   9、`*.zip` 用 unzip 解压    
 
+
+## 配置环境变量
+
+例子： 
+
+    ########  JAVA_HOME #######
+    JAVA_HOME=/server/java/jdk
+    export JAVA_HOME
+    PATH=$JAVA_HOME/bin:$JAVA_HOME/include:$JAVA_HOME/include/linux:$PATH
+    export PATH
+    CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+    export CLASSPATH
+    
+    
+    ########  MySQL #######
+    MYSQL_HOME=/server/databases/mysql-3810
+    export MYSQL_HOME
+    PATH=$MYSQL_HOME/bin:$PATH
+    export PATH

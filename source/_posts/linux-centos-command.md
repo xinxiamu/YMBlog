@@ -366,4 +366,17 @@ https://blog.csdn.net/dream_broken/article/details/52883883
 
     sync; echo 3 > /proc/sys/vm/drop_caches 
     
-               
+## 利用curl获取本机的外网ip
+
+    #oray国内地址，返回速度快
+    curl -s http://ddns.oray.com/checkip | awk -F ": " '{print $2}' | awk -F "\<" '{print $1}'
+    #返回快
+    curl ident.me
+    curl myip.dnsomatic.com
+    #返回较快
+    curl whatismyip.akamai.com
+    curl https://tnx.nl/ip
+    #返回慢，不推荐
+    curl ifconfig.me
+    curl icanhazip.com
+    curl ipecho.net/plain  
