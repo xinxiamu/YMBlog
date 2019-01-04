@@ -76,7 +76,7 @@ https://spring.io/guides/gs/spring-boot-docker/
 
     $ ./mvnw install dockerfile:build
     
-    或者
+    或者(如果么有mvnw)
     
     mvn install dockerfile:build
     
