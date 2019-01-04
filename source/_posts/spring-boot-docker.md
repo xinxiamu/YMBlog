@@ -147,4 +147,74 @@ https://spring.io/guides/gs/spring-boot-docker/
 
 3.执行命令构建并上传镜像到私服
 
-    mvn clean install dockerfile:push       
+    mvn clean install dockerfile:push   
+    
+## 绑定maven执行阶段
+
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+        <!-- tag::plugin[] -->
+        <plugin>
+            <groupId>com.spotify</groupId>
+            <artifactId>dockerfile-maven-plugin</artifactId>
+            <version>1.4.9</version>
+            <executions>
+                <execution>
+                  <id>default</id>
+                  <goals>
+                    <goal>build</goal>
+                    <goal>push</goal>
+                  </goals>
+                </execution>
+             </executions>
+            <configuration>
+                <repository>119.145.41.171:8082/${docker.image.prefix}/${project.artifactId}</repository>
+                <tag>${project.version}</tag>
+                <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+            </configuration>
+        </plugin>
+        <!-- end::plugin[] -->
+
+        <!-- tag::unpack[] -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>unpack</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>unpack</goal>
+                    </goals>
+                    <configuration>
+                        <artifactItems>
+                            <artifactItem>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>${project.artifactId}</artifactId>
+                                <version>${project.version}</version>
+                            </artifactItem>
+                        </artifactItems>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+        <!-- end::unpack[] -->
+    </plugins>
+
+这样子就可以使用`mvn package`,`mvn deploy`命令了。也可以精准使用`mvn dockerfile:build`。          
+    
+## 启动容器
+
+    $ docker run -e "SPRING_PROFILES_ACTIVE=prod" -p 8080:8080 -t springio/gs-spring-boot-docker
+   
+或者
+
+    $ docker run -e "SPRING_PROFILES_ACTIVE=dev" -p 8080:8080 -t springio/gs-spring-boot-docker
+    
+
+## 调试容器内的应用
+
+                 
