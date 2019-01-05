@@ -1,11 +1,11 @@
 ---
-title: zookeeper-start
+title: zookeeper入门
 date: 2018-06-28 10:00:46
 categories: zookeeper
 tags: 
 ---
 
-## docker安装zookeeper
+## docker安装zookeeper（推荐）
 
 参考:https://hub.docker.com/_/zookeeper
 
@@ -97,4 +97,6 @@ tags:
     [zk: zookeeper(CONNECTED) 9] get /zk
     Node does not exist: /zk  
     
-                
+## 直接安装
+
+……               

@@ -15,8 +15,11 @@ https://www.cnblogs.com/colder/p/5819197.html
 
 ## centos下安装环境
 
-1.依赖包安装： `yum install zlib fontconfig freetype libX11 libXext libXrender` 
-
+1.依赖包安装： `yum install zlib fontconfig freetype libX11 libXext libXrender`   
+2.下载执行包解压，放在固定目录下。  
+3.赋予执行包可执行权限：`chmod a+x wkhtmltopdf`。     
+4.把相关字体放到`usr/share/fonts`。 
+5.直接调用下面命令执行就可以了。
 
 ## 使用问题收集
 
