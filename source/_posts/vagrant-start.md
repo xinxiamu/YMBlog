@@ -78,6 +78,13 @@ tags: vagrant-start
 
 - 再次执行`vagrant box list`便可以看到。 
 
+离线方式：   
+https://cloud.centos.org/centos/7/vagrant/x86_64/images/
+
+下载相应box镜像，然后执行命令添加box：
+
+    vagrant box add centos/7 aa.box
+
 ## 创造自己box
 
 - 创建目录
