@@ -5,10 +5,7 @@ categories: 文件存储系统
 tags: 
 ---
 
-参考地址：https://www.gluster.org    
-https://blog.csdn.net/phn_csdn/article/details/75153913       
-https://yq.aliyun.com/articles/618056       
-https://yq.aliyun.com/articles/553536?spm=a2c4e.11153940.blogcont618056.26.19cf227bo9Tp8P
+参考地址：https://www.gluster.org 
 
 ## 原理
 
@@ -172,6 +169,123 @@ replica 3: 表明存储3个备份，后面指定服务器的存储目录
     
 重新查看卷信息，会看到卷的状态status变为Started。代表卷已经启动成功。   
 
+## 配置 GFS Client
+
+GFS客户端的节点必须和各个服务节点网络连通。ping命令检查。
+
+1.安装客户端
+
+    $ yum install -y glusterfs glusterfs-fuse
+    
+2.将客户端目录挂载到GFS服务的volume 
+
+- 在gluster客户节点创建本地目录：   
+
+        $ mkdir -p /data/gluster/dt1
+  
+- 将本地目录挂载到GFS Volume：
+
+        mount -t glusterfs 192.168.200.10:models /data/gluster/dt1
+        
+>参数说明：   
+192.168.200.10： 指的是GFS服务主节点的ip，一定是主节点。
+models： 指上面创建的GFS每个服务上的卷（volume）名称。   
+/data/gluster/dt1: 客户端的本地目录，要挂载的目录。        
+
+_注意_:   
+上面挂载客户端目录到服务卷的命令可能不成功，这是因为用的是ip的原因，得把主节点的ip改成域名才行。因此，现在客户节点配置hosts。     
+编辑`/etc/hosts`： 
+
+    192.168.200.10  server-node1  #GFS Server主节点
+    
+然后重新挂载：
+
+      mount -t glusterfs server-node1:models /data/gluster/dt1      
+
+挂载成功。
+
+3.查看挂载
+
+    [root@gluster-client1 dt1]# df -h
+    Filesystem                       Size  Used Avail Use% Mounted on
+    /dev/mapper/VolGroup00-LogVol00   38G  3.3G   35G   9% /
+    devtmpfs                         910M     0  910M   0% /dev
+    tmpfs                            920M     0  920M   0% /dev/shm
+    tmpfs                            920M  8.6M  911M   1% /run
+    tmpfs                            920M     0  920M   0% /sys/fs/cgroup
+    /dev/sda2                       1014M   63M  952M   7% /boot
+    tmpfs                            184M     0  184M   0% /run/user/1000
+    tmpfs                            184M     0  184M   0% /run/user/0
+    server-node1:models               40G  3.4G   35G   9% /data/gluster/dt1
+    
+可以看到，最后一个文件系统，就是我们挂载的。
+        
+4.测试上传文件    
+在客户机执行上传文件命令：   
+
+    [root@gluster-client1 dt1]# time dd if=/dev/zero of=/data/gluster/dt1/hello bs=100M count=1
+    1+0 records in
+    1+0 records out
+    104857600 bytes (105 MB) copied, 5.37804 s, 19.5 MB/s
+    
+    real	0m5.395s
+    user	0m0.001s
+    sys	0m0.182s
+    [root@gluster-client1 dt1]# ls
+    [root@gluster-client1 dt1]#    
+ 
+查看GFS Server各个节点对应的卷，以及客户节点的本地目录：
+
+    [root@server-node1 exp1]# pwd
+    /data/gluster/exp1
+    [root@server-node1 exp1]# ls
+    hello
+    
+都能看到一个hello的文件。说明的确按我们预期，有三份的文件数据，分别在三个服务节点上存储了。同时在客户端节点也有一份。    
+    
+5.继续测试  
+随便在客户节点本地目录下，创建文件`touch a`，然后查看各个服务节点，会发现，客户节点的a文件已经同步到三个服务的对应卷下了，编辑客户节点的a文件，各个服务节点对应的a文件也会相应改变。这说明了它们是一直同步的。      
+
+
+## GFS性能调优
+
+- 开启指定volume的配额： (models为volume名称)
+
+ 
+    gluster volume quota models enable
+    
+- 限制models中 / (既总目录)最大使用80GB空间  
+
+   
+    gluster volume quota models limit-usage / 80GB   
+    
+- 设置 cache 大小(此处要根据实际情况，如果设置太大可能导致后面客户端挂载失败) 
+
+
+    gluster volume set models performance.cache-size 512MB
+    
+- 开启异步，后台操作  
+
+    
+    gluster volume set models performance.flush-behind on
+    
+- 设置 io 线程 32 
+
+
+    gluster volume set models performance.io-thread-count 32
+    
+- 设置 回写 (写数据时间，先写入缓存内，再写入硬盘)
+
+    
+    gluster volume set models performance.write-behind on
+    
+- 调优之后的volume信息
+
+
+    gluster volume info
+    
+然后试下再上传文件，看是否快很多呢。                      
+
 ## 其它命令
 
 ### 查看所volume（卷）
@@ -181,4 +295,32 @@ replica 3: 表明存储3个备份，后面指定服务器的存储目录
 ### 删除volume（卷）
 
     gluster volume stop models //停止名字为 models 的磁盘 
-    gluster volume delete models //删除名字为 models 的磁盘                     
+    gluster volume delete models //删除名字为 models 的磁盘   
+
+
+### 卸载GlusterFS磁盘
+
+    -->gluster peer detach glusterfs4
+    
+### ACL访问控制
+
+    -->gluster volume set models auth.allow 192.168.56.*,10.0.1.*
+
+    volume set: success
+
+
+### 添加GlusterFS节点
+    -->gluster peer probe sc2-log5
+    -->gluster peer probe sc2-log6
+    -->gluster volume add-brick models sc2-log5:/data/gluster sc2-log6:/data/gluster
+
+### 迁移GlusterFS数据
+
+    -->gluster volume remove-brick models sc2-log1:/usr/local/share/models sc2-log5:/usr/local/share/models start
+    -->gluster volume remove-brick models sc2-log1:/usr/local/share/models sc2-log5:/usr/local/share/models status
+    -->gluster volume remove-brick models sc2-log1:/usr/local/share/models sc2-log5:/usr/local/share/models commit
+
+### 修复GlusterFS数据(在节点1宕机的情况下)
+
+    -->gluster volume replace-brick models sc2-log1:/usr/local/share/models sc2-log5:/usr/local/share/models commit -force
+    -->gluster volume heal models full                      
