@@ -7,6 +7,8 @@ tags:
 
 参考地址：https://www.gluster.org 
 
+https://my.oschina.net/hncscwc/blog/210072
+
 ## 原理
 
 
