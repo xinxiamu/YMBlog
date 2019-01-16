@@ -152,4 +152,26 @@ tags: spring-boot使用经验
     spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
     1
     
+  
+## spring boot tomcat临时文件夹的问题
+ 
+###  The temporary upload location [/tmp/tomcat.1337767218595042057.80/work/Tomcat/localhost/ROOT] is no 
+
+线上的系统中不能上传文件了，出现如下错误：
+
+    org.springframework.web.multipart.MultipartException: Could not parse multipart servlet request;nested exception is java.io.IOException: The temporary upload location [/tmp/tomcat.1337767218595042057.80/work/Tomcat/localhost/ROOT] is not valid 
     
+原因： 
+在linux系统中，springboot应用服务再启动（java -jar 命令启动服务）的时候，会在操作系统的/tmp目录下生成一个tomcat*的文件目录，上传的文件先要转换成临时文件保存在这个文件夹下面。由于临时/tmp目录下的文件，在长时间（10天）没有使用的情况下，就会被系统机制自动删除掉。所以如果系统长时间无人问津的话，就可能导致上面这个问题。
+
+临时解决方法： 
+手动在/tmp下创建相应得文件夹或者重启系统
+
+解决办法： 
+在 yml配置文件 中添加：
+
+    server.tomcat.basedir: /data/apps/temp  
+    
+手动的将临时文件夹设置为自定义的文件夹，就不会被Linux删除了。    
+    
+     
