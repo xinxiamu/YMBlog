@@ -312,6 +312,39 @@ https://hub.docker.com/_/redis/
 - 新用户   
 用最新的打包即可。
 
+## 实时共享文件的问题
+
+通常，默认的，启动虚拟机后或者重新启动虚拟机，会同步Vagrantfile所在目录到虚拟机的目录`/vagrant`下，但是修改了宿主机的文件，不能实时同步到虚拟机。
+
+下面介绍宿主机通过安装rsync来实时同步宿主机子的文件到虚拟机。    
+
+https://www.vagrantup.com/docs/synced-folders/rsync.html
+
+### window下安装rsync
+
+通过安装来cygwin安装rsync。     
+cygwin的网址：https://cygwin.com/install.html。下载安装即可。
+
+安装好后，配置`Vagrantfile`文件。 
+具体配置查看:https://www.vagrantup.com/docs/synced-folders/rsync.html
+
+    config.vm.synced_folder ".", "/vagrant",type:"rsync"
+    或
+    config.vm.synced_folder ".", "/vagrant",type:"rsync",rsync__auto:"true"
+
+启动或者重启`vagrant reload`,然后执行`vagrant rsync-auto`.    
+
+试试改变宿主机的文件，就实时同步到虚拟机了。只能单向把宿主机的文件同步到虚拟机。
+
+_命令说明_:   
+
+- type：rsync，关键，指定类型。
+- rsync__auto：默认是true，如果不配置。如果设置了false，则不实时同步该宿主机目录。
+
+
+### linux系统安装rsync
+
+    yun install rsync
 
 
 ## 学习资源

@@ -173,11 +173,13 @@ replica 3: 表明存储3个备份，后面指定服务器的存储目录
 
 ## 配置 GFS Client
 
+https://docs.gluster.org/en/latest/Administrator%20Guide/Setting%20Up%20Clients/
+
 GFS客户端的节点必须和各个服务节点网络连通。ping命令检查。
 
 1.安装客户端
 
-    $ yum install -y glusterfs glusterfs-fuse
+    $ yum install -y glusterfs glusterfs-fuse glusterfs-rdma
     
 2.将客户端目录挂载到GFS服务的volume 
 
