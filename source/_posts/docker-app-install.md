@@ -2,7 +2,7 @@
 title: docker安装各种常用开发应用软件
 date: 2018-07-19 15:49:39
 categories: docker
-tags: docker安装应用
+tags: 
 ---
 
 本文记录在docker各种应用程序的安装以及使用……
