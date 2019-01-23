@@ -120,7 +120,7 @@ log-bin=mysql-bin：开启二进制日志功能。使用binary logging，mysql-b
     
 4.查看主库状态：   
 
-    show grants for 'slave'@'%';
+    show master status;
     
 {%asset_img a-2.png%}  
 
