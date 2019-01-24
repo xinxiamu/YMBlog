@@ -187,6 +187,8 @@ _注意：_
 
 https://docs.gitlab.com/omnibus/settings/smtp.html
 
+里面有各家邮件配置，包括腾讯qq企业邮箱的配置。
+
     vim /opt/gitlab/config/gitlab.rb
     # 这里以新浪的邮箱为例配置smtp服务器
     gitlab_rails['smtp_enable'] = true
@@ -201,11 +203,34 @@ https://docs.gitlab.com/omnibus/settings/smtp.html
     # 还有个需要注意的地方是指定发送邮件所用的邮箱，这个要和上面配置的邮箱一致
     gitlab_rails['gitlab_email_from'] = 'name4mail@xxx.com'
     
+    -----------------------------------------------------------------------------
+    腾讯qq企业邮箱
+    
+    gitlab_rails['smtp_enable'] = true
+    gitlab_rails['smtp_address'] = "smtp.exmail.qq.com"
+    gitlab_rails['smtp_port'] = 465
+    gitlab_rails['smtp_user_name'] = "zhangmutian@xcsqjr.com"
+    gitlab_rails['smtp_password'] = "password"
+    gitlab_rails['smtp_authentication'] = "login"
+    gitlab_rails['smtp_enable_starttls_auto'] = true
+    gitlab_rails['smtp_tls'] = true
+    gitlab_rails['gitlab_email_from'] = 'zhangmutian@xcsqjr.com'
+    gitlab_rails['smtp_domain'] = "exmail.qq.com"
+    
            	      
-重启gitlab容器
+修改gitlab.rb配置文件之后，重启容器。
 
     docker restart gitlab
     
+    # 进入容器
+    docker exec -it gitlab bash
+     
+    # 重启gitlab
+    gitlab-ctl reconfigure
+
+_提醒：_ 
+上面三个步骤不可少，特别是要进入容器重启配置。如果只是重启容器，访问报502。
+   
             
 ### 登录
 
