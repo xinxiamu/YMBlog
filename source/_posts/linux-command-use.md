@@ -227,3 +227,67 @@ cp -r dir1 dir2
     export MYSQL_HOME
     PATH=$MYSQL_HOME/bin:$PATH
     export PATH
+    
+##  SELinux 使用  
+
+https://blog.csdn.net/yanjun821126/article/details/80828908     
+
+#### selinux 开启和关闭
+
+1.查看开启状态
+
+    /usr/sbin/sestatus -v      ##如果SELinux status参数为enabled即为开启状态   
+    
+    -------------------------------
+    
+    [root@xr-server selinux]# /usr/sbin/sestatus -v 
+    SELinux status:                 enabled
+    SELinuxfs mount:                /sys/fs/selinux
+    SELinux root directory:         /etc/selinux
+    Loaded policy name:             targeted
+    Current mode:                   enforcing
+    Mode from config file:          enforcing
+    Policy MLS status:              enabled
+    Policy deny_unknown status:     allowed
+    Max kernel policy version:      31
+    
+    Process contexts:
+    Current context:                unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+    Init context:                   system_u:system_r:init_t:s0
+    /usr/sbin/sshd                  system_u:system_r:sshd_t:s0-s0:c0.c1023
+    
+    File contexts:
+    Controlling terminal:           unconfined_u:object_r:user_devpts_t:s0
+    /etc/passwd                     system_u:object_r:passwd_file_t:s0
+    /etc/shadow                     system_u:object_r:shadow_t:s0
+    /bin/bash                       system_u:object_r:shell_exec_t:s0
+    /bin/login                      system_u:object_r:login_exec_t:s0
+    /bin/sh                         system_u:object_r:bin_t:s0 -> system_u:object_r:shell_exec_t:s0
+    /sbin/agetty                    system_u:object_r:getty_exec_t:s0
+    /sbin/init                      system_u:object_r:bin_t:s0 -> system_u:object_r:init_exec_t:s0
+    /usr/sbin/sshd                  system_u:object_r:sshd_exec_t:s0
+
+也可以用下面命令查看：
+
+    [root@xr-server selinux]# getenforce 
+    Enforcing
+    
+#### 关闭
+
+
+1.临时关闭（不需要重启系统）
+
+    setenforce 0  ##设置SELinux 成为permissive模式
+    
+    -----------------------------------------------------
+    setenforce 1  ##设置SELinux 成为enforcing模式（开启）
+    
+2.修改配置文件关闭（需要重启系统）
+
+修改/etc/selinux/config 文件
+
+将SELINUX=enforcing改为SELINUX=disabled
+
+然后重启系统即可。    
+    
+            

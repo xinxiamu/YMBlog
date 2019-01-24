@@ -124,7 +124,113 @@ EL是Red Hat Enterprise Linux的简写
     
 6.重启
 
-    sudo gitlab-ctl restart    
-        
+    sudo gitlab-ctl restart
+     
+##  docker环境安装gitlab 
+
+参考：https://docs.gitlab.com/omnibus/docker/ 
+
+### 启动gitlab容器服务
+
+1.查看系统是否开启了SELinux  
+
+    /usr/sbin/sestatus -v      ##如果SELinux status参数为enabled即为开启状态
     
-   
+2.启动gitlab ce容器
+
+如果SELinux是开启的，则执行：  
+
+    sudo docker run --detach \
+    	--hostname gitlab.example.com \
+    	--publish 443:443 --publish 80:80 --publish 10022:22 \
+    	--name gitlab \
+    	--restart always \
+    	--volume /srv/gitlab/config:/etc/gitlab:Z \
+    	--volume /srv/gitlab/logs:/var/log/gitlab:Z \
+    	--volume /srv/gitlab/data:/var/opt/gitlab:Z \
+    	gitlab/gitlab-ce:latest      
+
+这样才能确保容器进程拥有足够权限，在卷上创建相关的配置文件。
+
+如果SELinux是关闭的，则执行：  
+
+    sudo docker run --detach \
+    	--hostname gitlab.example.com \
+    	--publish 443:443 --publish 80:80 --publish 10022:22 \
+    	--name gitlab \
+    	--restart always \
+    	--volume /srv/gitlab/config:/etc/gitlab \
+    	--volume /srv/gitlab/logs:/var/log/gitlab \
+    	--volume /srv/gitlab/data:/var/opt/gitlab \
+    	gitlab/gitlab-ce:latest
+    	
+    	    	
+_注意：_   
+
+宿主机22端口一般会被占用，所以映射到别的端口，这里映射到10022端口，后面修改配置即可。
+
+### 修改配置    
+
+容器成功执行后面，会在映射目录/srv/gitlab/config/目录下生成一个配置文件gitlab.rb。     
+
+编辑gitlab.rb文件   
+
+    vim /opt/gitlab/config/gitlab.rb
+    # 配置http协议所使用的访问地址
+    external_url 'http://172.16.81.81'
+     
+    # 配置ssh协议所使用的访问地址和端口
+    gitlab_rails['gitlab_ssh_host'] = '172.16.81.81'
+    gitlab_rails['gitlab_shell_ssh_port'] = 10022
+    
+配置邮件发送  
+
+https://docs.gitlab.com/omnibus/settings/smtp.html
+
+    vim /opt/gitlab/config/gitlab.rb
+    # 这里以新浪的邮箱为例配置smtp服务器
+    gitlab_rails['smtp_enable'] = true
+    gitlab_rails['smtp_address'] = "smtp.xxx.com"
+    gitlab_rails['smtp_port'] = 25
+    gitlab_rails['smtp_user_name'] = "name4mail"
+    gitlab_rails['smtp_password'] = "passwd4mail"
+    gitlab_rails['smtp_domain'] = "xxx.com"
+    gitlab_rails['smtp_authentication'] = :login
+    gitlab_rails['smtp_enable_starttls_auto'] = true
+     
+    # 还有个需要注意的地方是指定发送邮件所用的邮箱，这个要和上面配置的邮箱一致
+    gitlab_rails['gitlab_email_from'] = 'name4mail@xxx.com'
+    
+           	      
+重启gitlab容器
+
+    docker restart gitlab
+    
+            
+### 登录
+
+浏览器打开：http://192.168.33.10/
+
+初始页面要求先改密码，密码改为：a1234567    
+
+修改成功会跳转到登录页面，输入账号密码登录即可：    
+
+用户名：root  密码：a1234567    
+ 
+登录成功后看到：    
+
+{%asset_img a-1.png%} 
+
+### git参考访问地址
+
+    # HTTP
+    http://172.16.81.81/root/test-docker-gitlab.git 
+    # SSH 
+    ssh://git@172.16.81.81:10022/root/test-docker-gitlab.git
+    
+### 升级
+
+### 中文社区版安装
+
+参考：https://hub.docker.com/r/beginor/gitlab-ce 
+     
