@@ -51,4 +51,11 @@ linux：把字体{%asset_link simsun.ttc simsun.ttc%}添加到系统`usr/share/f
     
 样例3：
     
-    wkhtmltopdf.exe --footer-left "cxmr(500)        制表日期：[date] [time]"  --footer-right "制表者： XC-TEST001        页次： [page]/[topage]"  --footer-line --footer-font-size 8  --footer-spacing 5 orders-atn.html orders-atn.html orders-atn.html b.pdf    
+    wkhtmltopdf.exe --footer-left "cxmr(500)        制表日期：[date] [time]"  --footer-right "制表者： XC-TEST001        页次： [page]/[topage]"  --footer-line --footer-font-size 8  --footer-spacing 5 orders-atn.html orders-atn.html orders-atn.html b.pdf  
+    
+## 精准打印出现中文不清晰，缺少笔画
+
+--disable-smart-shrinking   这个参数一定要加上，加上页面就不缩小了；    
+--dpi 这个参数不要用默认值，要设置大一点；letter-spacinng : 0  不然字间距太密；     
+
+特别加上dpi参数。
