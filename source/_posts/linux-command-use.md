@@ -288,6 +288,26 @@ https://blog.csdn.net/yanjun821126/article/details/80828908
 
 将SELINUX=enforcing改为SELINUX=disabled
 
-然后重启系统即可。    
+然后重启系统即可。
+
+## 免密码切换到root用户
+
+ Linux下普通用户切换到root用户下，默认情况是需要输入密码，这在自动化脚本里面很不方便，因此需要实现普通用户免密切换到root用户。
+
+解决方案：
+
+- 以root用户登录shell终端，执行vim /etc/sudoers命令，找到如下图所示位置：   
+
+      
+- 在下方添加一行类似的数据，例如用户名称为elk,则添加内容为：
+  
+        ## Allow root to run any commands anywhere 
+        root	ALL=(ALL) 	ALL
+        vagrant    ALL=(ALL)       ALL
+    
+vagrant是用户名。在vagrant下，执行sudo -s就可以直接切换到root了。其它的账号类似。
+
+           
+- 保存之后，在普通用户下输入sudo -s命令就可以直接免密切换到root账户了。       
     
             
