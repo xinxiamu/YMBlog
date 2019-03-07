@@ -38,3 +38,8 @@ tags: ubuntu-navicat
 第一次进入主界面，乱码。    
 
 点击菜单：工具->选项->常规->界面字体, 下拉选择：AR PL UMing CN.然后关闭，再次启动navicat即可。
+
+--------
+工具-》选项-》常规-》界面字体：Noto Sans CJK TC Regular
+工具-》选项-》编辑器，编辑器字体：Noto Sans CJK SC Bold
+工具-》选项-》记录，网格字体：Noto Sans CJK KR Regular
