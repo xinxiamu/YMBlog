@@ -5,3 +5,6 @@ Would skip repository .deploy_git/
 public/
 .deploy_git/
 
+package.json
+package-lock.json
+db.json

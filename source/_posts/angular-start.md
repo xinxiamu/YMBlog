@@ -46,6 +46,17 @@ _angular-cli_ 安装
 
 `cnpm install -g @angular/cli`
 
+### Windows环境下
+
+直接下载nodejs的可执行文件，运行安装即可。安装成功后，打开命令行窗口检查是否安装成功。
+
+`node -v`       
+`npm -v`    
+
+显示安装的版本号，则表明正常安装。
+
+后面步骤同上……
+
 ## 跑起angular项目
 
 1. 创建新项目
@@ -59,4 +70,3 @@ _angular-cli_ 安装
     `ng serve --open` 或者 `ng serve -o`
     
 如果一切顺利，会自动打开浏览器显示网页。至此，一个`hello wold`项目完成了。    
-        
