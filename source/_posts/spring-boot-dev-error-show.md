@@ -174,4 +174,34 @@ tags: spring-boot使用经验
     
 手动的将临时文件夹设置为自定义的文件夹，就不会被Linux删除了。    
     
+ 
+ ## 集成jooq后，添加aop切面，应用启动变慢的问题
+ 
+- 问题描述：
+ 
+ spring boot2项目中，jpa集成jooq，添加切面，然后启动程序，每次都卡在初始化jpa的地方，要等待一两分钟甚至更久才能启动应用。
+
+aop表达式：
+
+    @Before("execution(public * com.xrlj.servicesyscommon.service.impl..*.*(..)))")
+    
+启动会卡在这里：    
+
+    2019-04-15 00:21:42.100  INFO 9072 --- [  restartedMain] log4jdbc.log4j2                          : 2. Connection closed. {executed in 0ms} 
+    2019-04-15 00:21:42.100  INFO 9072 --- [  restartedMain] log4jdbc.log4j2                          : 2. Connection.close() returned 
+    2019-04-15 00:21:42.122  INFO 9072 --- [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'myself_db'
+
+- 问题解决：
+把execution表达式，改成within表达式即可。    
+
+改成：
+
+    @Before("within(com.xrlj.servicesyscommon.service.impl..*)")
+
+即可。
+
+参考：
+网上描述，说是集成了jooq后才会这样的。   
+https://github.com/jOOQ/jOOQ/issues/5902
      
+    

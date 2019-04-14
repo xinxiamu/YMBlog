@@ -347,6 +347,26 @@ _命令说明_:
     yun install rsync
 
 
+## win7启动powershell版本过低问题
+
+    F:\xrlj.github.com\xrlj-vagrant-dev>vagrant up
+    The version of powershell currently installed on this host is less than
+    the required minimum version. Please upgrade the installed version of
+    powershell to the minimum required version and run the command again.
+    
+      Installed version: 2
+    
+      Minimum required version: 3
+
+要求powershell版本3以上，所以要升级powershell。  
+
+下面是升级powershell到4.0的方法： 
+
+https://social.technet.microsoft.com/wiki/contents/articles/21016.how-to-install-windows-powershell-4-0.aspx    
+
+下载对应版本。 
+win7 sp1下载这个：Windows6.1-KB2819745-x64-MultiPkg.msu
+
 ## 学习资源
 
 - http://www.imooc.com/learn/805
