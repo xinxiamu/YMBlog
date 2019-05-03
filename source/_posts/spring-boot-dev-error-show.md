@@ -2,7 +2,7 @@
 title: spring-boot开发常见异常收录
 date: 2017-09-29 00:31:25
 categories: spring-boot
-tags: spring-boot使用经验
+tags: 
 ---
 
 ## jpa篇
