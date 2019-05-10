@@ -2,7 +2,7 @@
 title: 分布式系统几大难点
 date: 2017-11-08 14:57:10
 categories: 分布式系统
-tags: distributed-difficulty
+tags:
 ---
 
 ## 1. 分布式ID
@@ -16,3 +16,5 @@ tags: distributed-difficulty
 ## 5. 分布式跨库连表查询
 
 ## 6. 分布式定时任务
+
+## 7.分布式锁
