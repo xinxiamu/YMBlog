@@ -88,7 +88,7 @@ http://cloud.spring.io/spring-cloud-static/Edgware.SR3/multi/multi__spring_cloud
 
 对明文zmt加密（认证用户名为admin、密码为123456）
 
-    mutian@mutian-ThinkPad-T440p:~$ curl -u admin:123456 http://192.168.1.104:ncrypt -d zmt
+    mutian@mutian-ThinkPad-T440p:~$ curl -u admin:123456 http://192.168.1.104:3331/encrypt -d zmt
     AQB43S/okputI/v009zUuV/1XYmKSQROyYwWCWMC8phPeQa00/ABmS8QByz4ZWE57buwM1GIQ9lkmh8Yafgy6QUryq/XJk/oIck1zuN6M7IMepAFaJE4J8i4y5/LdH5h6gpfW06MeSiQbjg+393ztnDH37lWakfxEJ5yNtevXbV/LQC6u8bPvd/4riDHmgJYq8d7INJZKh4Y9TX+5a9a2YGivTuhn+qHruOylP43eMiK0EuUkmJF3B2zD6t8CWu5M84vnHjDVLFGmLuK3xfRpmG83ofl+86XjgdE+TlqcId+hRpfD28ELluU4Oc/N7ujNZAmKa2OtK0jve7oz27dQnrMDh5n6qkGAIcjNoeHLa7EgkP9XEargjGLkaXewHME56Q=  
     
 对密文解密：
