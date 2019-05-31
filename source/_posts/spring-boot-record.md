@@ -33,3 +33,14 @@ tags:
 上面这段代码，初始化了该Bean，所以上面的将不会再执行。
 
 - 用处：常用在spring boot starter中。
+
+## 集成hikari数据源
+
+### 错误一，maxLifetime问题
+
+    The last packet successfully received from the server was 1,057,018 milliseconds ago.  The last packet sent successfully to the server was 1,057,026 milliseconds ago.). Possibly consider using a shorter maxLifetime value.
+
+该警告代码在：com.zaxxer.hikari.pool.PoolBase类中，可以debbuger进去看。 
+
+解决：
+
