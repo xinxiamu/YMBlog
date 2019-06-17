@@ -41,6 +41,19 @@ tags: vagrant-start
 
 {% asset_img d.png %}
 
+_windows下安装问题_：     
+安装Virtualbox的时候回滚，并提示发生一个严重的错误。
+
+    解决方法如下：
+    
+    打开服务选项  ：win + R  然后在跳出来的编辑框 键入  services.msc   然后回车
+    
+    1.Device Install Service
+    
+    2.Device Setup Manager
+    
+    开启这两个服务，然后右键安装程序，以管理员身份运行，然后就能安装啦~
+
 ### 安装vagrant
 
 安装最新版本。
