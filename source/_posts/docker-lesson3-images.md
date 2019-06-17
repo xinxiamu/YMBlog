@@ -740,6 +740,18 @@ node官方Dockerfile例子：
 
 `$	docker	image	rm`
 
+## 基于本地模板导入导出镜像
+
+## 把镜像上传到docker公共仓库
+
+https://hub.docker.com
+
+……
+
+## 把镜像上传到私服
+
+后面章节有介绍……
+
 ## 镜像的实现原理
 
 [UnionFS](https://en.wikipedia.org/wiki/UnionFS)
