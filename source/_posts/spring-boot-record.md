@@ -34,6 +34,16 @@ tags:
 
 - 用处：常用在spring boot starter中。
 
+### @ConditionalOnxxx相关注解总结
+
+参考：     
+https://www.cnblogs.com/yixianyixian/p/7346894.html     
+https://blog.csdn.net/xcy1193068639/article/details/81491071
+
+### 自定义Conditional
+
+https://blog.csdn.net/zhanglu1236789/article/details/78999496
+
 ## 集成hikari数据源
 
 ### 错误一，maxLifetime问题
