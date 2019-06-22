@@ -70,3 +70,32 @@ _angular-cli_ 安装
     `ng serve --open` 或者 `ng serve -o`
     
 如果一切顺利，会自动打开浏览器显示网页。至此，一个`hello wold`项目完成了。    
+
+
+## 卸载并安装指定版本Angular CLI
+
+1.卸载之前的版本
+
+npm uninstall -g @angular/cli
+
+2.清除缓存，确保卸载干净
+
+npm cache clean --force
+
+3.检查是否卸载干净
+
+输入命令
+
+ng -v
+
+若显示command not found则卸载干净
+
+4.安装指定版本
+
+npm install -g @angular/cli@1.6.3
+
+5.检查版本号
+
+ng -v
+
+
