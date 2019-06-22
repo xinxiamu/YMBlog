@@ -96,6 +96,6 @@ npm install -g @angular/cli@1.6.3
 
 5.检查版本号
 
-ng -v
+ng version
 
 
