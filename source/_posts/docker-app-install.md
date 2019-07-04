@@ -285,6 +285,8 @@ redis.conf配置文件基本内容，自由添加：
 切记注释掉：#daemonize yes 否则无法启动容器
 重要话说三遍：注释掉#daemonize yes，注释掉#daemonize yes，注释掉#daemonize yes
 
+配置文件：{% asset_link redis.conf %}
+
 ## 安装mysql-server
 
 仓库：https://hub.docker.com/r/library/mysql/
