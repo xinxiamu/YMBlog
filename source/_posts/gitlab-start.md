@@ -186,7 +186,7 @@ _注意：_
 
 编辑gitlab.rb文件
 
-`vim /opt/gitlab/config/gitlab.rb`
+`vim /srv/gitlab/config/gitlab.rb`
 
 1.设置`external_url`:   
  
@@ -268,6 +268,10 @@ _提醒：_
 登录成功后看到：    
 
 {%asset_img a-1.png%} 
+
+### 设置系统语言
+
+切换到官方镜像之后， 中文设置方法： 依次点击工具栏最右侧用户头像 》 Settings 》 Preferred language ， 然后选择 简体中文 即可。
 
 ### git参考访问地址
 
