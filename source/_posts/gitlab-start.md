@@ -163,25 +163,49 @@ EL是Red Hat Enterprise Linux的简写
     	--volume /srv/gitlab/logs:/var/log/gitlab \
     	--volume /srv/gitlab/data:/var/opt/gitlab \
     	gitlab/gitlab-ce:latest
-    	
-    	    	
+    	   	    	 	    	
 _注意：_   
 
 宿主机22端口一般会被占用，所以映射到别的端口，这里映射到10022端口，后面修改配置即可。
+
+映射到宿主机任意端口：
+
+    sudo docker run --detach \
+      --hostname gitlab.example.com \
+      --publish 8929:80 --publish 2289:22 \
+      --name gitlab \
+      --restart always \
+      --volume /srv/gitlab/config:/etc/gitlab \
+      --volume /srv/gitlab/logs:/var/log/gitlab \
+      --volume /srv/gitlab/data:/var/opt/gitlab \
+      gitlab/gitlab-ce:latest 
 
 ### 修改配置    
 
 容器成功执行后面，会在映射目录/srv/gitlab/config/目录下生成一个配置文件gitlab.rb。     
 
-编辑gitlab.rb文件   
+编辑gitlab.rb文件
 
-    vim /opt/gitlab/config/gitlab.rb
+`vim /opt/gitlab/config/gitlab.rb`
+
+1.设置`external_url`:   
+ 
     # 配置http协议所使用的访问地址
-    external_url 'http://172.16.81.81'
+    #external_url 'gitlab.example.com:端口'
+    external_url 'http://172.16.81.81:端口'
+    
+    or
+    
+    # For HTTPS (notice the https)
+    #external_url "https://gitlab.example.com:端口"
+    external_url 'https://172.16.81.81:端口'
+    
+2.设置`gitlab_shell_ssh_port`:
      
     # 配置ssh协议所使用的访问地址和端口
+    #gitlab_rails['gitlab_ssh_host'] = 'gitlab.example.com'
     gitlab_rails['gitlab_ssh_host'] = '172.16.81.81'
-    gitlab_rails['gitlab_shell_ssh_port'] = 10022
+    gitlab_rails['gitlab_shell_ssh_port'] = 2289
     
 配置邮件发送  
 
@@ -230,8 +254,7 @@ https://docs.gitlab.com/omnibus/settings/smtp.html
 
 _提醒：_ 
 上面三个步骤不可少，特别是要进入容器重启配置。如果只是重启容器，访问报502。
-   
-            
+        
 ### 登录
 
 浏览器打开：http://192.168.33.10/
