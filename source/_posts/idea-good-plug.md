@@ -19,6 +19,12 @@ tags: idea插件利器
 
 ### JRebel插件的安装以及破解
 
+idea版本： IntelliJ IDEA 2019.2 x64
+
+参考：      
+https://blog.csdn.net/qq_41570658/article/details/96280146      
+https://github.com/ilanyu/ReverseProxy/releases/tag/v1.4
+
 1.第一步，idea在线安装JRebel插件。     
 2.第二步，激活JRebel：
      
