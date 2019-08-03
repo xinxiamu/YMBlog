@@ -313,6 +313,8 @@ my.cnf内容
     collation-server = utf8mb4_unicode_ci
     init_connect='SET NAMES utf8mb4'
     default_authentication_plugin = mysql_native_password
+    wait_timeout = 100
+    interactive_timeout = 100
     
     [client]
     default-character-set=utf8mb4
@@ -342,6 +344,8 @@ _注意_:
     init_connect='SET NAMES utf8mb4'
     default_authentication_plugin = mysql_native_password
     skip-name-resolve
+    wait_timeout = 100
+    interactive_timeout = 100
 
 然后重启mysql服务再试。
         
