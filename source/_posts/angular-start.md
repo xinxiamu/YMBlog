@@ -2,7 +2,7 @@
 title: angular入门
 date: 2018-06-23 10:32:10
 categories: angular
-tags: angular入门
+tags:
 ---
 
 本文介绍如何搭建angular开发环境……
