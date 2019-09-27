@@ -2,7 +2,7 @@
 title: centos常用命令收藏
 date: 2018-06-11 17:37:52
 categories: CentOs
-tags: centos常用命令
+tags:
 ---
 
 本文主要记录常用的命令……  
@@ -284,7 +284,7 @@ https://blog.csdn.net/dream_broken/article/details/52883883
     
 ### 9.查看目录大小
 
-    du /etc -sh
+    du /etc -sh  
     
 ### 10.查看服务器初始安装的软件包
 
@@ -337,6 +337,10 @@ https://blog.csdn.net/dream_broken/article/details/52883883
 
     hostname
     cat /etc/sysconfig/network
+    
+### 20.查看文件大小  
+
+    ll -h a.txt    
     
 ## CentOS挂载新硬盘                                        
 参考：http://blog.sina.com.cn/s/blog_6177e8400101ntvu.html 
