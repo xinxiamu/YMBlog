@@ -63,6 +63,9 @@ https://blog.csdn.net/zhanglu1236789/article/details/78999496
     
 - 原因分析：
 
+1.使用了Spring data jpa 作为持久层框架    
+2.使用了Spring Redis 缓存
+
 这是 Spring Boot 的 Autoconfigure 包干的好事，里面有个叫 RedisRepositoriesAutoConfiguration 的类会检查当前的 classpath 里面是不是存在 Jedis 和 @EnableRedisRepositories，如果存在，无论你的代码有没有用，他都会帮你自动启用这个注解（不带参数），于是整个 classpath 的类都会被扫进去。
 
 - 解决：
