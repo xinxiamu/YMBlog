@@ -30,6 +30,8 @@ tags:
 
 包装输入字节流成缓冲字节流。一块一块的从缓冲区读取字节数据，不必逐个逐个调用操作系统API。
 
+{%asset_img a-1.png%}
+
 1.例如，把文件输入字节流包装成缓冲流：
 
     BufferedInputStream bufferedInputStream = new BufferedInputStream(
@@ -56,5 +58,18 @@ tags:
 实际上，这个问题，首先是要弄清楚你的硬盘缓冲区，每次刷新读取的大小的。如果你的硬盘缓冲区就4KB，那么，你设置缓冲流的大小小于4KB,或者大于4KB都是不明智的，小于4KB，那每次刷新，都浪费空间，大于，就要刷新两次。
 
 所以，一般的，设置成和硬盘缓冲区一样的大小就好了。要通过各种长度测试，找出硬盘读取大小来确定。
+
+4.mark() and reset()
+
+`BufferInputStream`支持`mark()`和`reset()`方法。其继承自类`FilterInputStream`，类`FilterInputStream`是支持这两个方法的。   
+
+并非所有InputStream子类都支持这些方法。       
+
+可以调用方法`markSupported()`查看是否支持`mark()`和`reset()`。
+
+
+
+
+
 
                                                 
