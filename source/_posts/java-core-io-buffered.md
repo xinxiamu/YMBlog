@@ -67,7 +67,33 @@ tags:
 
 可以调用方法`markSupported()`查看是否支持`mark()`和`reset()`。
 
+4.关闭BufferedInputStream
 
+确保关闭流，避免耗尽系统资源。关闭流，同时会刷出数据。
+
+    BufferedInputStream bufferedInputStream = new BufferedInputStream(
+                          new FileInputStream("c:\\data\\input-file.txt"));
+    
+    int data = bufferedInputStream.read();
+    while(data != -1) {
+      data = bufferedInputStream.read();
+    }
+    bufferedInputStream.close();
+    
+以上代码不能保证百分百关闭流，因为如果上面代码抛出异常，将无法执行`bufferedInputStream.close()`,此时，需要捕捉异常，保证不管何时，都能正确关闭流。下面利用`try-with-resources`保证总能准确关闭。    
+
+    try(BufferedInputStream bufferedInputStream =
+            new BufferedInputStream( new FileInputStream("c:\\data\\input-file.txt") ) ) {
+    
+        int data = bufferedInputStream.read();
+        while(data != -1){
+            data = bufferedInputStream.read();
+        }
+    }
+    
+一旦执行线程退出try块，就关闭BufferedInputStream。如果从try块内部引发了异常，则将捕获该异常，并关闭BufferedInputStream，然后重新引发该异常。因此，可以保证在try-with-resources块中使用BufferedInputStream时将其关闭。    
+
+## Java BufferedOutputStream   
 
 
 
