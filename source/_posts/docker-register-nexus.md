@@ -59,7 +59,14 @@ _登录报错处理：_
 
 错误处理：
 
-{%asset_img j-1.png%}         
+{%asset_img j-1.png%} 
+
+再次登录：
+
+    [root@xr-server-dev eureka-server]# docker login  -u admin -p admin123 localhost:8082
+    WARNING! Using --password via the CLI is insecure. Use --password-stdin.
+    Login Succeeded
+成功        
     
 ## 上传镜像
 
