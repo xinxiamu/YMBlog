@@ -49,6 +49,18 @@ tags:
 
     docker login -u admin -p admin123 ip:8082  #注意这里的端口是配置仓库时选择的端口号
     
+_登录报错处理：_
+
+1.错误：
+
+    [root@xr-server-dev eureka-server]# docker login  -u admin -p admin123 localhost:8082
+    WARNING! Using --password via the CLI is insecure. Use --password-stdin.
+    Error response from daemon: login attempt to http://localhost:8082/v2/ failed with status: 401 Unauthorized
+
+错误处理：
+
+{%asset_img j-1.png%}         
+    
 ## 上传镜像
 
 不能直接上传镜像：`docker push nginx:latest`。因为docker默认是上传到docker hub仓库的。

@@ -1,7 +1,7 @@
 ---
 title: java-core-often
 date: 2019-10-19 10:40:47
-categories:
+categories: java
 tags:
 ---
 
