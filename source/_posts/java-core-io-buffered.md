@@ -95,7 +95,96 @@ tags:
 
 ## Java BufferedOutputStream   
 
+捕获缓冲区中写入`BufferedOutputStream`中的数据，批量的读入到底层的`OutputStream`中，提高IO的速度。
 
+1.创建BufferedOutputStream
 
+为`OutputStream`添加缓冲，只需要将其包装下即可，如下：
 
-                                                
+    OutputStream output = new BufferedOutputStream(
+                          new FileOutputStream("c:\\data\\output-file.txt"));
+                          
+2.设置`BufferedOutputStream`缓冲区的大小
+
+    int bufferSize = 8 * 1024;
+    OutputStream output = new BufferedOutputStream(
+                          new FileOutputStream("c:\\data\\output-file.txt"),
+                              bufferSize
+    );
+    
+设置的大小，最好是1024的倍数，这与硬盘中的大多数内置缓冲效果最佳。
+
+3.如何选择最佳的缓冲区大小
+
+缓冲区大小的设置，与io硬件设备息息相关。
+
+设置不同的bufferSize实验，找出哪种缓冲区大小似乎可以在您的具体硬件上提供最佳性能。    
+
+如果硬盘一次至少写入4kb，那么设置缓冲区小于4kb是不合理的，设置成6kb也是愚蠢的，这会造成硬盘碎片化，浪费存储空间。最好设置成4kb的倍数。
+
+即使你的硬盘一次写入4kb，也不应该设置缓冲区大小为4kb，硬盘擅长按顺序写入数据，这意昧着它擅长写入相连的多个块。因此，设置缓冲区大小大于4kb比如16kb，32kb或者更大，性能更好。
+
+要找到最佳的缓冲区大小，先要找到硬盘写入的块的大小，然后把缓冲区设置成块的倍数。最后实验不同倍数写入数据，看哪个倍数的大小写入速度最快，就用那个。
+
+4.写入
+
+使用`write()`方法写入数据到缓冲区。
+
+    BufferedOutputStream bufferedOutputStream =
+        new BufferedOutputStream(new FileOutputStream("c:\\data\\output-text.txt"));
+    
+    bufferedOutputStream.write(123);
+    
+上面例子，把`123`写入到给定的缓冲区。
+
+5.以字节数组形式写入
+
+由于Java BufferedOutputStream是OutputStream的子类，因此您也可以将字节数组写入BufferedOutputStream，而不是一次只写入一个字节。
+
+    BufferedOutputStream bufferedOutputStream =
+        new BufferedOutputStream(new FileOutputStream("c:\\data\\output-text.txt"));
+    
+    byte bytes =  new byte[]{1,2,3,4,5};
+    
+    outputStream.write(bytes);                              
+
+6.刷新缓冲区flush()
+
+当您将数据写入Java BufferedOutputStream时，数据会在内部缓存在字节缓冲区中，直到字节缓冲区已满为止，这时整个缓冲区都将写入底层的OutputStream中。
+
+调用`flush()`方法刷新确保缓冲区的数据输出到硬盘等io设备。而不必等缓冲区满了，自动关闭再输出。
+
+    OutputStream outputStream =
+        new BufferedOutputStream(new FileOutputStream("c:\\data\\output-text.txt"));
+    
+    byte bytes =  new byte[]{1,2,3,4,5};
+    
+    outputStream.write(bytes);
+    
+    outputStream.flush()
+
+7.关闭缓冲输出流BufferedOutputStream
+
+使用缓冲区记得关闭，底层的输出流也会自动关闭。否则会极大浪费操作系统资源。
+
+    BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(
+                          new FileOutputStream("c:\\data\\output-file.txt"));
+    
+    while(hasMoreData()) {
+        int data = getMoreData();
+        bufferedOutputStream.write(data);
+    }
+    bufferedOutputStream.close();        
+    
+java1.7以上使用方式：
+
+放到try块里面，会自动会关闭资源。
+
+    try( BufferedOutputStream bufferedOutputStream =
+            new BufferedOutputStream(new FileOutputStream("c:\\data\\output-text.txt"))) {
+    
+        while(hasMoreData()) {
+            int data = getMoreData();
+            output.write(data);
+        }
+    }                                            
