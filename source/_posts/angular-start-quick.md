@@ -30,7 +30,14 @@ tags:
     
     E:\angular\study\angular-quick>ng generate component top-bar
 
-## 创建服务
+## 运行应用
+
+    cd my-app
+    ng serve --open
+    
+ng serve 命令会启动开发服务器、监视文件，并在这些文件发生更改时重建应用。
+
+--open（或者只用 -o 缩写）选项会自动打开你的浏览器，并访问 http://localhost:4200/。    
 
 
 
