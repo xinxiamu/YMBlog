@@ -80,18 +80,27 @@ _解决：_
         
 关键是：`allowCredentials: true`,设置为true，即允许cookie跨域。
 
-2.同时在客户端配置（angular2应用）
+2.前端配置
 
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Version': '0',
-        'Content-Type':  'application/json'
-      }),
-      params: new HttpParams(),
-      withCredentials: true
-    };
+前端跨域设置 withCredentials: true
+
+- angular2应用
+
+        const httpOptions = {
+          headers: new HttpHeaders({
+            'Content-Version': '0',
+            'Content-Type':  'application/json'
+          }),
+          params: new HttpParams(),
+          withCredentials: true
+        };
     
 关键：`withCredentials: true`。 
+
+- ajax请求
+
+在ajax请求里加上xhrFields: {withCredentials: true}, crossDomain: true。
+    
 
 即在http请求中，options参数中添加参数`withCredentials: true`。
 
