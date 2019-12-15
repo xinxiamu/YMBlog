@@ -1,6 +1,6 @@
 ---
 title: mysql主从复制延迟问题
-date: 2019-12-15 10:57:45
+date: 2018-10-24 22:11:17
 categories: mysql
 tags:
 ---
