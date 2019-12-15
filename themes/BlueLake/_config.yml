@@ -147,8 +147,8 @@ links:
     url: http://spring4all.com/
   - title: 开源中国
     url: https://www.oschina.net/
-  - title: w3cschool学习网
-    url: https://www.w3cschool.cn/
+  - title: w3school学习网
+    url: https://www.w3school.com.cn/
   - title: angular中文教程
     url: https://angular.cn/
   - title: java教程
@@ -169,3 +169,11 @@ links:
     url: http://www.markdown.cn/
   - title: spring教程baeldung
     url: https://www.baeldung.com/
+  - title: java并发编程
+    url: https://createchance.github.io/
+  - title: 并发编程
+    url: http://ifeve.com/
+  - title: Java IO Tutorial
+    url: http://tutorials.jenkov.com/java-io/index.html
+  - title: Java NIO Tutorial
+    url: http://tutorials.jenkov.com/java-nio/index.html

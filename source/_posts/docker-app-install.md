@@ -285,6 +285,8 @@ redis.conf配置文件基本内容，自由添加：
 切记注释掉：#daemonize yes 否则无法启动容器
 重要话说三遍：注释掉#daemonize yes，注释掉#daemonize yes，注释掉#daemonize yes
 
+配置文件：{% asset_link redis.conf %}
+
 ## 安装mysql-server
 
 仓库：https://hub.docker.com/r/library/mysql/
@@ -313,6 +315,8 @@ my.cnf内容
     collation-server = utf8mb4_unicode_ci
     init_connect='SET NAMES utf8mb4'
     default_authentication_plugin = mysql_native_password
+    wait_timeout = 100
+    interactive_timeout = 100
     
     [client]
     default-character-set=utf8mb4
@@ -342,6 +346,8 @@ _注意_:
     init_connect='SET NAMES utf8mb4'
     default_authentication_plugin = mysql_native_password
     skip-name-resolve
+    wait_timeout = 100
+    interactive_timeout = 100
 
 然后重启mysql服务再试。
         

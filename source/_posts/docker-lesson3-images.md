@@ -740,6 +740,52 @@ node官方Dockerfile例子：
 
 `$	docker	image	rm`
 
+## 基于本地模板导入导出镜像
+
+## 把镜像上传到docker公共仓库
+
+https://hub.docker.com
+
+现在上面网址中注册：
+
+{% asset_img b-1.png %}
+
+1.登录docker
+
+    [root@xr-server-dev ~]# docker login 
+    Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
+    Username: xinxiamu
+    Password: 
+    Login Succeeded
+
+2.对本地自定义的docker镜像打标签，必须先打标签：
+
+    [root@xr-server-dev ~]# docker tag fastdfs-server:v1 xinxiamu/fdfs-server:0.1
+    
+3.上传到hub.docker.com:
+
+    [root@xr-server-dev ~]# docker push xinxiamu/fdfs-server:0.1
+    The push refers to repository [docker.io/xinxiamu/fdfs-server]
+    77f438662c4e: Pushed 
+    7051cce03d08: Pushed 
+    47262386cb42: Pushed 
+    89b5ef66bef1: Pushed 
+    6498ec7e0c6f: Pushed 
+    939591e6b702: Pushed 
+    d99d7b3f4b3f: Pushed 
+    e5f0ae3c8627: Pushed 
+    79332ca36cf7: Pushed 
+    d69483a6face: Pushed 
+    0.1: digest: sha256:811bc129bc6da0fe648e8dc4388dac39db592d86c14f4df87b2b70fc13b80fb5 size: 2403
+
+刷新页面可以看到已经上传：
+
+{% asset_img b-2.png %}        
+
+## 把镜像上传到私服
+
+后面章节有介绍……
+
 ## 镜像的实现原理
 
 [UnionFS](https://en.wikipedia.org/wiki/UnionFS)
