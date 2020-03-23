@@ -17,6 +17,10 @@ tags: mysql使用问题收藏
     init_connect='SET NAMES utf8mb4'
     default_authentication_plugin = mysql_native_password
     skip-name-resolve
+    # 一下三个配置，解决too manay connection问题。
+    max_connections=1000 # 最大连接数，默认100
+    wait_timeout = 300 #
+    interactive_timeout = 500
     
     log-bin = mysql-bin
     server-id = 1
@@ -48,4 +52,14 @@ tags: mysql使用问题收藏
      
      SET GLOBAL wait_timeout=10000
      
-     
+## mysql too many connections 解决方法     
+
+以下三个配置，解决too manay connection问题。
+
+    max_connections=1000 # 最大连接数，默认100
+    wait_timeout = 300 #
+    interactive_timeout = 500
+    
+参考：
+https://www.jianshu.com/p/fc40067c4dc9      
+https://jingyan.baidu.com/article/fc07f989c5c6bd52fee5192c.html 

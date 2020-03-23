@@ -315,8 +315,10 @@ my.cnf内容
     collation-server = utf8mb4_unicode_ci
     init_connect='SET NAMES utf8mb4'
     default_authentication_plugin = mysql_native_password
-    wait_timeout = 100
-    interactive_timeout = 100
+    # 一下三个配置，解决too manay connection问题。
+    max_connections=1000 # 最大连接数，默认100
+    wait_timeout = 300 #
+    interactive_timeout = 500
     
     [client]
     default-character-set=utf8mb4
@@ -713,5 +715,4 @@ https://hub.docker.com/r/sonatype/nexus
  网址：http://ip:8085
  
  默认账号密码：admin admin123
- 
  
