@@ -47,7 +47,9 @@ _示例：_
 
 生产者避免数据丢失：https://www.cnblogs.com/vipstone/p/9350075.html
 
-## work消息模型
+
+##  work消息模型
+
 
 工作队列或者竞争消费者模式。
 
@@ -62,7 +64,7 @@ _示例：_
 >- 另外一种方式就是，能者多劳。消费的越快的消费者，消费更多的消息。这种模式下，手动ack的情况下才生效，自动ack不生效。
 
 
-## Publish/subscribe（交换机类型：Fanout，也称为广播 ）
+##  Publish/subscribe（交换机类型：Fanout，也称为广播 ）
 
 {%asset_img b-3.png%}
 
@@ -114,7 +116,7 @@ _思考：_
 
 建议使用 publish/subscribe，发布订阅模式比工作队列模式更强大（也可以做到同一队列竞争），并且发布订阅模式可以指定自己专用的交换机。
 
-## Routing 路由模型（交换机类型：direct）
+##  Routing 路由模型（交换机类型：direct）
 
 {%asset_img b-4.png%}
 
@@ -221,7 +223,7 @@ _C2_：消费者，其所在队列指定了需要routing key 为 info、error、
 
 我们发送sms的RoutingKey，发现结果：只有指定短信的消费者1收到消息了。
 
-## Topics 通配符模式（交换机类型：topics）
+##  Topics 通配符模式（交换机类型：topics）
 
  每个消费者监听自己的队列，并且设置带统配符的routingkey,生产者将消息发给broker，由交换机根据routingkey来转发消息到指定的队列。
 
