@@ -1,5 +1,5 @@
 ---
-title: Java IO Scanner And Formatting
+title: Java IO：第四节-Scanner And Formatting
 date: 2019-11-11 09:34:53
 categories: java-io
 tags:
@@ -98,5 +98,8 @@ ScanXan示例将所有输入标记视为简单的String值。扫描程序还支�
 
 ## Formatter
 
+https://docs.oracle.com/javase/tutorial/essential/io/formatting.html
+
+格式化输出……
 
 
