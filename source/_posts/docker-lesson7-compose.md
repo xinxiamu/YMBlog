@@ -56,6 +56,8 @@ _注意：_ For alpine, the following dependency packages are needed: py-pip, py
 
 这样，在重新登录后，输入docker-compose 并按下Tab键，Compose就可自动补全命令了。
 
+_注:_网址`raw.githubusercontent.com`可能需要翻墙才能访问。或者配置`hosts`,添加内容：`199.232.28.133 raw.githubusercontent.com`,亲测有效。
+
 ## 快速入门
 
 这里展示一个简单的示例，简单了解docker compose使用步骤。
