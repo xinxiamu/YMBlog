@@ -58,6 +58,26 @@ _注意：_ For alpine, the following dependency packages are needed: py-pip, py
 
 _注:_网址`raw.githubusercontent.com`可能需要翻墙才能访问。或者配置`hosts`,添加内容：`199.232.28.133 raw.githubusercontent.com`,亲测有效。
 
+测试安装是否成功：
+```shell script
+[root@xr-server-dev bash-completion]# docker-compose -version
+docker-compose version 1.26.0, build d4451659
+```
+
+自动补齐需要依赖工具bash-complete，如果没有，则需要手动安装，命令如下：
+```shell script
+yum install -y bash-completion
+```
+安装成功后，得到文件为 /usr/share/bash-completion/bash_completion，如果没有这个文件，则说明系统上没有安装这个工具。
+
+使其生效：
+```shell script
+source /usr/share/bash-completion/bash_completion
+
+source /usr/share/bash-completion/completions/docker
+```
+
+
 ## 快速入门
 
 这里展示一个简单的示例，简单了解docker compose使用步骤。
