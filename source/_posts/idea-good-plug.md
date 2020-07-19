@@ -48,7 +48,7 @@ https://github.com/ilanyu/ReverseProxy/releases/tag/v1.4
 1.第一步，idea在线安装JRebel插件。     
 2.第二步，激活JRebel：
      
-- 下载https://github.com/ilanyu/ReverseProxy/releases/tag/v1.4，并运行exe文件。       
+- 下载https://github.com/ilanyu/ReverseProxy/releases/tag/v1.4   并运行exe文件。       
 - 安装下图方式进行激活，   
 License Server: http://127.0.0.1:8888/88414687-3b91-4286-89ba-2dc813b107ce      
 email: 932852117@qq.com 
