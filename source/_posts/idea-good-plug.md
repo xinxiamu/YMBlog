@@ -19,7 +19,27 @@ tags:
 
 ### JRebel插件的安装以及破解
 
-idea版本： IntelliJ IDEA 2019.2 x64
+#### 最新版本破解
+
+服务器地址监听服务器地址：
+
+http://jrebel.cicoding.cn
+
+GUID生成器：
+
+http://jrebel.cicoding.cn/guid
+
+监听配置格式：
+
+http://jrebel.cicoding.cn/GUID
+
+生成的如下：
+
+http://jrebel.cicoding.cn/4B068EB5-0941-4645-1E98-FC077D530A61
+
+
+
+#### idea版本： IntelliJ IDEA 2019.2 x64
 
 参考：      
 https://blog.csdn.net/qq_41570658/article/details/96280146      
