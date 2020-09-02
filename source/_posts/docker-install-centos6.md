@@ -62,4 +62,6 @@ centos升级内核方法：{% post_link  centos6-kernel-update Linux升级内核
     
 6.3 删除Docker镜像
 
-    [root@localhost ~]# rm -rf /var/lib/docker               
+    [root@localhost ~]# rm -rf /var/lib/docker       
+    
+

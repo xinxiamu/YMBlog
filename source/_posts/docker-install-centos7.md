@@ -147,3 +147,19 @@ The contents of the list depend upon which repositories are enabled, and will be
 
     $ sudo rm -rf /var/lib/docker
                                       
+                                      
+## 安装异常问题
+
+1.安装docker遇到：package docker-ce-3:19.03.8-3.el7.x86_64 requires containerd.io >= 1.2.2-3, but none of the providers can be installed  
+
+执行 yum install docker-ce docker-ce-cli containerd.io 提示：
+
+_错误问题_: package docker-ce-3:19.03.8-3.el7.x86_64 requires containerd.io >= 1.2.2-3, but none of the providers can be installed
+
+_解决方法_：   
+进入阿里云镜像地址：https://mirrors.aliyun.com/docker-ce/linux/centos/7/x86_64/edge/Packages/找到你想要的或者最新的containerd.io包，拼接在阿里云地址后面，
+如下：
+```shell script
+yum install -y https://mirrors.aliyun.com/docker-ce/linux/centos/7/x86_64/edge/Packages/containerd.io-1.2.13-3.1.el7.x86_64.rpm
+```
+然后再执行 yum install docker-ce docker-ce-cli containerd.io 即可。                                      
