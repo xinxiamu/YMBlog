@@ -12,9 +12,13 @@ tags: centos-docker-install
 ## 1. 卸载旧版本docker
 
     $ sudo yum remove docker \
-                      docker-common \
-                      docker-selinux \
-                      docker-engine
+                        docker-client \
+                        docker-client-latest \
+                        docker-common \
+                        docker-latest \
+                        docker-latest-logrotate \
+                        docker-logrotate \
+                        docker-engine
 
 ---
     [root@iZj6ca50pk1lwxqo14jss8Z ~]# sudo yum remove docker \
@@ -70,9 +74,10 @@ tags: centos-docker-install
 
 4.1 安装最新版本
 
-    $ sudo yum install docker-ce
+    $ sudo yum install docker-ce docker-ce-cli containerd.io
     
 > Warning: If you have multiple Docker repositories enabled, installing or updating without specifying a version in the yum install or yum update command will always install the highest possible version, which may not be appropriate for your stability needs.
+> 安装报错： 查看下面收集安装异常信息。
 
 4.2 安装指定版本
 在生成环境，有时候要安装指定版本。
