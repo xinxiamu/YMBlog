@@ -17,7 +17,7 @@ docker run --name mysql-redmine -p 3309:3306 --restart always --privileged=true 
 ## 安装redmine
 
 ```shell script
-docker run -d --name redmine -p 8889:3000 --restart always -v /server/redmine/redmine-dir/files:/usr/src/redmine/files:z -v /server/redmine/redmine-dir/plugins:/usr/src/redmine/plugins:z -e REDMINE_DB_MYSQL=mysql-redmine -e REDMINE_DB_USERNAME=redmine -e REDMINE_DB_PASSWORD=a1234567@! --link mysql-redmine:mysql redmine
+docker run -d --name xc-redmine -p 8888:3000 --restart always -v /server/redmine/redmine-dir/files:/usr/src/redmine/files:z -v /server/redmine/redmine-dir/plugins:/usr/src/redmine/plugins:z -e REDMINE_DB_MYSQL=mysql-redmine -e REDMINE_DB_USERNAME=redmine -e REDMINE_DB_PASSWORD=a1234567@! --link mysql-redmine:mysql redmine
 ```
 
 ## docker-compose安装
