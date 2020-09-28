@@ -434,3 +434,105 @@ https://blog.csdn.net/dream_broken/article/details/52883883
     curl ifconfig.me
     curl icanhazip.com
     curl ipecho.net/plain  
+    
+## 挂载磁盘
+
+1.查看已挂载
+```shell script
+[root@xc-product-server-hn003 ~]# df -h
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        3.7G     0  3.7G   0% /dev
+tmpfs           3.7G     0  3.7G   0% /dev/shm
+tmpfs           3.7G  564K  3.7G   1% /run
+tmpfs           3.7G     0  3.7G   0% /sys/fs/cgroup
+/dev/vda1        40G  4.3G   36G  11% /
+overlay          40G  4.3G   36G  11% /var/lib/docker/overlay2/fe37037ef94f25079e4fdaeb9bc4485574cb309d032839b9638db0c1ffd88802/merged
+tmpfs           755M     0  755M   0% /run/user/0
+```
+
+2.查看磁盘情况
+```shell script
+[root@xc-product-server-hn003 ~]# fdisk -l
+Disk /dev/vda: 40 GiB, 42949672960 bytes, 83886080 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x4500abcf
+
+Device     Boot Start      End  Sectors Size Id Type
+/dev/vda1  *     2048 83886046 83883999  40G 83 Linux
+
+
+Disk /dev/vdb: 100 GiB, 107374182400 bytes, 209715200 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+```    
+
+有磁盘`/dev/vdb`未挂载。下面挂载到目录`/server`下。
+
+3.创建挂载点`/server`
+```shell script
+mkdir /server
+```
+
+4.格式化磁盘
+```shell script
+[root@xc-product-server-hn003 ~]# mkfs.ext4  /dev/vdb
+mke2fs 1.45.4 (23-Sep-2019)
+Creating filesystem with 26214400 4k blocks and 6553600 inodes
+Filesystem UUID: 0a280208-edad-4186-8ded-ab5550fdb0dc
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+	4096000, 7962624, 11239424, 20480000, 23887872
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (131072 blocks): done
+Writing superblocks and filesystem accounting information: done   
+```
+
+5.永久挂载
+```shell script
+vim /etc/fstab
+```
+
+添加一行：
+`/dev/vdb 				  /server		  ext4	  defaults        0 0`
+
+```text
+# 
+# /etc/fstab
+# Created by anaconda on Mon Aug 24 06:23:59 2020
+#
+# Accessible filesystems, by reference, are maintained under '/dev/disk/'.
+# See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info.
+#
+# After editing this file, run 'systemctl daemon-reload' to update systemd
+# units generated from this file.
+#
+UUID=32f2af94-a1cd-4880-bb61-9ede22264d88 /                       xfs     defaults        0 0
+/dev/vdb                                  /server                 ext4    defaults        0 0
+```
+保存，退出vim。
+
+6.重启系统生效
+```shell script
+reboot
+```
+
+7.再次查看，看是否挂载成功
+```shell script
+[root@xc-product-server-hn003 ~]# clear
+[root@xc-product-server-hn003 ~]# df -h
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        3.7G     0  3.7G   0% /dev
+tmpfs           3.7G     0  3.7G   0% /dev/shm
+tmpfs           3.7G  472K  3.7G   1% /run
+tmpfs           3.7G     0  3.7G   0% /sys/fs/cgroup
+/dev/vda1        40G  4.3G   36G  11% /
+/dev/vdb         98G   61M   93G   1% /server
+tmpfs           755M     0  755M   0% /run/user/0
+```
+看到`/dev/vdb`已经挂载成功。
