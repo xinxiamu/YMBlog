@@ -61,6 +61,7 @@ tags: mysql使用问题收藏
     interactive_timeout = 500
     
 ## 新建用户并授权
+只能本机登录：
 ```shell script
 CREATE USER 'service_scf_root'@'localhost' IDENTIFIED BY '84012d469d52d8e29a4b95ef87dd6d97';
 
@@ -68,6 +69,15 @@ GRANT ALL PRIVILEGES ON service_scf.* TO'service_scf_root'@'localhost';
 
 flush privileges;
 ```    
+
+可远程登录：
+```shell script
+CREATE USER 'service_scf_root'@'%' IDENTIFIED BY '84012d469d52d8e29a4b95ef87dd6d97';
+
+GRANT ALL PRIVILEGES ON service_scf.* TO 'service_scf_root'@'%';
+
+flush privileges;
+```
     
 参考：
 https://www.jianshu.com/p/fc40067c4dc9      
