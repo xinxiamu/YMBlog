@@ -1,5 +1,5 @@
 ---
-title: zookeeper入门
+title: zookeeper使用入门
 date: 2018-06-28 10:00:46
 categories: zookeeper
 tags: 
@@ -99,4 +99,53 @@ tags:
     
 ## 直接安装
 
-……               
+下载地址： https://zookeeper.apache.org/releases.html
+
+1.下载后解压到某个目录下。  
+2.修改配置文件，再conf目录下，复制一份`zoo_sample.cfg`,把名字改为`zoo.cfg`。并修改内容：
+
+```shell script
+# The number of milliseconds of each tick
+tickTime=2000
+# The number of ticks that the initial 
+# synchronization phase can take
+initLimit=10
+# The number of ticks that can pass between 
+# sending a request and getting an acknowledgement
+syncLimit=5
+# the directory where the snapshot is stored.
+# do not use /tmp for storage, /tmp here is just 
+# example sakes.
+dataDir=/tmp/zookeeper
+# the port at which the clients will connect
+# 监听客户端连接的端口
+clientPort=2181
+# the maximum number of client connections.
+# increase this if you need to handle more clients
+#maxClientCnxns=60
+#
+# Be sure to read the maintenance section of the 
+# administrator guide before turning on autopurge.
+#
+# http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance
+#
+# The number of snapshots to retain in dataDir
+#autopurge.snapRetainCount=3
+# Purge task interval in hours
+# Set to "0" to disable auto purge feature
+#autopurge.purgeInterval=1
+
+## Metrics Providers
+#
+# https://prometheus.io Metrics Exporter
+#metricsProvider.className=org.apache.zookeeper.metrics.prometheus.PrometheusMetricsProvider
+#metricsProvider.httpPort=7000
+#metricsProvider.exportJvmInfo=true
+
+#内嵌的jetty服务器的启动端口，默认8080，不修改的话，可能引起端口冲突
+admin.serverPort=8079
+
+
+```
+
+## 集群配置             

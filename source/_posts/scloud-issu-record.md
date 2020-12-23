@@ -127,4 +127,123 @@ zuul配置：
         allowedMethods: "*"
         allowedHeaders: "*"        
 
+-------------------------------
+### feign服务调用问题
+
+#### 问题一
+
+_1.问题描述：_
+
+在服务A中调用服务B，无法调用B的接口，报如下异常：
+```text
+feign.RetryableException: too many bytes written
+```
+
+_2.问题原因：_
+
+是因为feign请求body和Content-Length长度不一致导致。
+
+_3.解决方案：_
+
+在自定义feign拦截器中，过滤掉头信息`content-length`：
+
+```text
+if (name.equals("content-length")){
+    continue;
+}
+```
+具体如下：
+
+```java
+package com.xrlj.framework.config;
+
+import feign.Logger;
+import feign.RequestInterceptor;
+import feign.RequestTemplate;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
+
+/**
+ * 放在扫描包下。全局有效。所有feign客户端有效。
+ * 配合自定义熔断策略。
+ */
+@Configuration
+public class FeignConfiguration {
+
+    /**
+     * 日志级别。FULL打印请求头，请求体等信息。
+     * @return
+     */
+    @Bean
+    Logger.Level feignLoggerLevel() {
+        return Logger.Level.FULL;
+    }
+
+    /**
+     * 创建Feign请求拦截器，在发送请求前设置认证的token,各个微服务将token设置到环境变量中来达到通用
+     * @return
+     * */
+    @Bean
+    public FeignBasicAuthRequestInterceptor basicAuthRequestInterceptor() {
+        return new FeignBasicAuthRequestInterceptor();
+    }
+
+    /**
+     * Feign请求拦截器
+     * @author yinjihuan
+     * @create 2017-11-10 17:25
+     **/
+    public class FeignBasicAuthRequestInterceptor  implements RequestInterceptor {
+
+        public FeignBasicAuthRequestInterceptor() {
+
+        }
+
+        @Override
+        public void apply(RequestTemplate template) {
+            //配置自定义熔断策略或者在.yml中配置熔断策略为hystrix.command.default.execution.isolation.strategy: SEMAPHORE
+            //否则这里返回null
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attributes == null) {
+                return;
+            }
+            HttpServletRequest request = attributes.getRequest();
+
+            //添加所有头信息。feign调用，在各组件中传递。保持各组件之间session一致性，同一个sessionId。
+            Enumeration<String> headerNames = request.getHeaderNames();
+            if (headerNames != null) {
+                while (headerNames.hasMoreElements()) {
+                    String name = headerNames.nextElement();
+                    Enumeration<String> values = request.getHeaders(name);
+                    while (values.hasMoreElements()) {
+                        String value = values.nextElement();
+                        // 跳过 content-length
+                        // https://blog.csdn.net/qq_39986681/article/details/107138740
+                        // https://juejin.cn/post/6844903939079421966
+                        if (name.equals("content-length")){
+                            continue;
+                        }
+                        template.header(name, value);
+                    }
+                }
+            }
+        }
+    }
+}
+
+```
+
+4.参考：
+https://blog.csdn.net/qq_39986681/article/details/107138740
+https://juejin.cn/post/6844903939079421966
+
+
+
+
+
 
