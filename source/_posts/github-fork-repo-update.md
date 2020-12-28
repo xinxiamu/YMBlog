@@ -2,7 +2,7 @@
 title: 如何直接在github网站上更新你fork的repo
 date: 2017-10-13 09:39:58
 categories: github
-tags: github-fork-repo-update
+tags:
 ---
 玩过github的人一定会在你自己的账号上fork了一些github开源项目。这些开源项目往往更新比较活跃，你今天fork用到你自己的项目中去了，过几个星期这个fork的origin可能有一些bugfix了，你怎么办呢？当然直接到Origin repo中去clone是一个方法，但是github的public repo有可能过一段时间就被作者删除了，你是否希望在origin即使已经被删除的情况下，你的账号下依然有你钟情的repo？
 
