@@ -104,3 +104,26 @@ tags:
      * APPLICATION IMPORTS
      */
 
+## 问题-绑定html内容出现警告
+
+问题：
+
+```html
+<span [innerHTML]="{{detailsInfo.description}}"></span>
+
+---------------------------------------
+
+WARNING: sanitizing HTML stripped some content (see http://g.co/ng/security#xss).
+```
+
+解决：
+
+```text
+ constructor(public sanitizer: DomSanitizer) {
+  }
+```
+```html
+<span [innerHTML]="sanitizer.bypassSecurityTrustHtml(detailsInfo.description)"></span>
+```
+
+
