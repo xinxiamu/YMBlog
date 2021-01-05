@@ -424,7 +424,7 @@ dev   etc			  lib64  mnt	root  srv   usr
 root@415c0167fb5a:/# 
 ```
     
-## 安装zabbix
+### 安装zabbix
 
 #### 启动一个mysql服务器实例
 
@@ -533,7 +533,7 @@ Zabbix监控Java应用程序的关键点在于：配置Zabbix-JavaGateway、让Z
     docker run --name zabbix-java-gateway --link zabbix-server-mysql:zabbix-server -d zabbix/zabbix-java-gateway:latest
     
 
-## 安装Jenkins
+### 安装Jenkins
 
 ####　配置日志：   
 
@@ -665,11 +665,11 @@ https://wiki.jenkins.io/display/JENKINS/Running+Jenkins+behind+Nginx
 
 注意：按上面docker安装jenkins的时候，映射了数据卷，所以可以知道：`server/data/jenkins/war` 为jenkins的web根目录。注意配置好。
 
-## 安装gitlab
+### 安装gitlab
 
 参考网址：https://docs.gitlab.com/omnibus/docker/
 
-## 安装sonatype/nexus
+### 安装sonatype/nexus
 
 参考网址：   
 https://hub.docker.com/r/sonatype/nexus 

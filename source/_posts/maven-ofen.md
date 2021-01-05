@@ -34,7 +34,19 @@ maven项目所依赖的jar包会导出到targed/dependency目录中。
             <skipTests>true</skipTests>
         </configuration>
     </plugin>
+    
+### 指定测试或者开发等环境执行命令
 
+```shell script
+mvn clean install deploy -Pprod
+```   
+关键是`-Pprod`这里，这里表示指定prod环境执行。 
+
+### 指定settings.xml执行
+
+```shell script
+mvn install --settings E:\apache-maven-3.3.9\conf\settings-ztesoft.xml -Dmaven.test.skip=true
+```
 
 ### 打包jar
 
@@ -209,3 +221,4 @@ maven项目所依赖的jar包会导出到targed/dependency目录中。
 {% asset_img a-1.png %} 
 
 可以看到里面代理了很多第三方私服，阿里云的，spring的，等。然后整合到`maven-pblic`group组中即可。
+

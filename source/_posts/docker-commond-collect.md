@@ -5,7 +5,7 @@ categories: docker
 tags:
 ---
 
-## 容器
+### 容器
 
 #### 查看容器端口映射
 
@@ -33,7 +33,7 @@ tags:
 
     docker rm `docker ps -a | grep xxxxx | awk '{print $1}'`    
     
-## 镜像
+### 镜像
 
 #### 删除所有镜像
 
@@ -51,4 +51,36 @@ tags:
     
 3.删除所有none镜像
 
-    docker rmi `docker images | grep  "<none>" | awk '{print $3}'`                
+    docker rmi `docker images | grep  "<none>" | awk '{print $3}'`    
+    
+#### 导出导入镜像
+
+_导出镜像：_
+
+如果要存出镜像到本地文件，可以使用docker save命令。例如：
+
+```shell script
+[root@xr-server-dev images]# docker save -o eureka-server.tar 192.168.0.3:8082/xrlj/eureka-server:0.0.1
+```
+
+如上，把镜像导出当前文件目录下，名字`eureka-server.tar`。
+
+_导入镜像:_
+
+可以使用docker load从存出的本地文件中再导入到本地镜像库。例如：
+
+```shell script
+[root@iZj6c37qyt7ur3kr6b8u5nZ docker-images]# docker load -i eureka-server.tar
+```
+
+如上，在当前目录下，导入镜像`eureka-server.tar`。
+
+
+#### 临时运行镜像的一个实例
+
+```shell script
+docker run -rm -p 1111:1111  192.168.0.3:8082/xrlj/eureka-server:0.0.1
+```
+
+关闭运行后，会自动删除，不会创建容器。
+                
