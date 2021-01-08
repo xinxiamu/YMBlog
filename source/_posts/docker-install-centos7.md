@@ -144,15 +144,27 @@ The contents of the list depend upon which repositories are enabled, and will be
 
 1. 卸载docker安装包：
 
+```shell script
+yum list installed | grep docker
+```
+本机安装过旧版本
+docker.x86_64,docker-client.x86_64,docker-common.x86_64 
+  
+全部删除安装的软件包
 
-    $ sudo yum remove docker-ce
-    
+```shell script
+yum -y remove docker.x86_64                        
+yum -y remove docker-client.x86_64                  
+yum -y remove docker-common.x86_64
+```
+   
 2. 卸载docker安装包不会自动删除相关资源，要手动删除：
 
-
-    $ sudo rm -rf /var/lib/docker
+```shell script
+$ sudo rm -rf /var/lib/docker
+```
                                       
-                                      
+                                     
 ## 安装异常问题
 
 1.安装docker遇到：package docker-ce-3:19.03.8-3.el7.x86_64 requires containerd.io >= 1.2.2-3, but none of the providers can be installed  

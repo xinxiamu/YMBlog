@@ -215,7 +215,7 @@ redis-server --appendonly yes : 在容器执行redis-server启动命令，并打
 #### 使用自定义配置文件（推荐）
 
 
-     docker run --name redis-6380 -p 6380:6380 --restart=always -v /server/data/redis-6380/data:/data -v /server/data/redis-6380/conf/redis.conf:/usr/local/etc/redis/redis.conf -d redis redis-server  /usr/local/etc/redis/redis.conf --appendonly yes
+     docker run -v /server/data/redis-6380/conf:/usr/local/etc/redis -v /server/data/redis-6380/data:/data --name redis-6380 --restart=always -p 6380:6380 -d redis redis-server /usr/local/etc/redis/redis.conf
      
 redis.conf配置文件基本内容，自由添加：
     

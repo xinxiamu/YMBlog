@@ -48,6 +48,13 @@ mvn clean install deploy -Pprod
 mvn install --settings E:\apache-maven-3.3.9\conf\settings-ztesoft.xml -Dmaven.test.skip=true
 ```
 
+### 查看环境
+
+```text
+$ mvn help:active-profiles 列出当前激活的Profile
+$ mvn help:all-profiles 列出当前所有的Profile
+```
+
 ### 打包jar
 
 #### 普通打包

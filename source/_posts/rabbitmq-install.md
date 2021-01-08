@@ -76,7 +76,7 @@ erlang-nox (>= 1:19.3-1) | esl-erlang (>= 1:19.3-1).
 
 执行下面命令安装：
 
-    docker run --hostname myRabbit --restart=always --name my-rabbitmq -v /server/data/rabbitmq:/var/lib/rabbitmq  -e RABBITMQ_DEFAULT_USER=ymu -e RABBITMQ_DEFAULT_PASS=123456 -e RABBITMQ_DEFAULT_VHOST=ymu_vhost  -p 15672:15672 -p 4369:4369 -p 5671-5672:5671-5672 -p 15671:15671 -p 25672:25672 -d rabbitmq:3.7.8-management
+    docker run --hostname myRabbit --restart=always --name my-rabbitmq -v /server/data/rabbitmq:/var/lib/rabbitmq  -e RABBITMQ_DEFAULT_USER=ymu -e RABBITMQ_DEFAULT_PASS=123456 -e RABBITMQ_DEFAULT_VHOST=ymu_vhost  -p 15672:15672 -p 4369:4369 -p 5671-5672:5671-5672 -p 15671:15671 -p 25672:25672 -d rabbitmq:3-management
     
 安装成功后，在浏览器输入：
 
