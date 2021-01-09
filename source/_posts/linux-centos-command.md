@@ -536,3 +536,19 @@ tmpfs           3.7G     0  3.7G   0% /sys/fs/cgroup
 tmpfs           755M     0  755M   0% /run/user/0
 ```
 看到`/dev/vdb`已经挂载成功。
+
+## 路由
+
+https://blog.csdn.net/hzhsan/article/details/44753533
+
+1.查看路由表
+
+```shell script
+ # route -n   # 查看路由表 
+```
+
+2.添加路由
+
+3.删除路由
+
+

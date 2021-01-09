@@ -157,6 +157,11 @@ yum -y remove docker.x86_64
 yum -y remove docker-client.x86_64                  
 yum -y remove docker-common.x86_64
 ```
+
+最新版本，一般
+```shell script
+sudo yum remove docker-ce docker-ce-cli containerd.io
+```
    
 2. 卸载docker安装包不会自动删除相关资源，要手动删除：
 
