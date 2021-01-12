@@ -33,6 +33,20 @@ tags:
 
     docker rm `docker ps -a | grep xxxxx | awk '{print $1}'`    
     
+#### 查看容器运行ip地址
+
+下面查看容器名为`rabbitmq`的容器的ip地址：
+
+```shell script
+docker inspect --format '{{.NetworkSettings.IPAddress}}' rabbitmq
+```    
+
+或者
+```shell script
+docker inspect rabbitmq
+```
+然后查找`IPAddress`
+    
 ### 镜像
 
 #### 删除所有镜像

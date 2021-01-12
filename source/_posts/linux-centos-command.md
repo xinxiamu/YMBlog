@@ -549,6 +549,62 @@ https://blog.csdn.net/hzhsan/article/details/44753533
 
 2.添加路由
 
+```shell script
+sudo route add -net 172.17.1.0  netmask 255.255.255.0 gw 192.168.0.48
+```
+
 3.删除路由
+
+## 防火墙
+
+### 开启防火墙提示：Unit is masked的解决办法
+
+那是因为锁定了防火墙，需要解锁。
+
+### 防火墙锁定，解锁
+
+解锁：
+```shell script
+[root@website ~]# systemctl unmask firewalld
+Removed symlink /etc/systemd/system/firewalld.service.
+```
+
+再次锁定：
+
+```shell script
+[root@website ~]# systemctl mask firewalld
+```
+
+### 启动、关闭防火墙
+
+查看防火墙状态
+```shell script
+[root@xc-product-server-hn002 ~]# systemctl status firewalld.service 
+● firewalld.service - firewalld - dynamic firewall daemon
+   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; disabled; vendor preset: enabled)
+   Active: inactive (dead) since Tue 2021-01-12 14:43:51 CST; 10min ago
+     Docs: man:firewalld(1)
+  Process: 90155 ExecStart=/usr/sbin/firewalld --nofork --nopid $FIREWALLD_ARGS (code=exited, status=0/SUCCESS)
+ Main PID: 90155 (code=exited, status=0/SUCCESS)
+
+Jan 12 14:39:26 xc-product-server-hn002 systemd[1]: Starting firewalld - dynamic firewall daemon...
+Jan 12 14:39:27 xc-product-server-hn002 systemd[1]: Started firewalld - dynamic firewall daemon.
+Jan 12 14:39:27 xc-product-server-hn002 firewalld[90155]: WARNING: AllowZoneDrifting is enabled. This is considered an insecure configuration option. It will be removed in a future release. Please consider disabling it now.
+Jan 12 14:43:50 xc-product-server-hn002 systemd[1]: Stopping firewalld - dynamic firewall daemon...
+Jan 12 14:43:51 xc-product-server-hn002 systemd[1]: firewalld.service: Succeeded.
+Jan 12 14:43:51 xc-product-server-hn002 systemd[1]: Stopped firewalld - dynamic firewall daemon.
+```
+
+启动防火墙：
+
+```shell script
+systemctl start firewalld.service
+```
+
+关闭防火墙：
+
+```shell script
+systemctl stop firewalld.service
+```
 
 
