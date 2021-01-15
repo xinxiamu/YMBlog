@@ -9,6 +9,17 @@ tags:
 
 ## 安装-Docker环境下
 
+```shell script
+docker run -p 9000:9000 \
+--restart=always \
+--name minio1 \
+-v /mnt/data:/data \
+-e "MINIO_ROOT_USER=izajzo6yycy5d65vexjmdvtts" \
+-e "MINIO_ROOT_PASSWORD=kvb9fv35c14soranzsz8bwzyf" \
+-d minio/minio server /data
+```
+
+
 ## Java客户端使用
 
 ### 上传文件
