@@ -41,3 +41,14 @@ Failed to load resource: the server responded with a status of 413 (Request Enti
  _提醒：_  
  
  于是奇葩的问题被我们遇到了，详细配置请参考下面。我们的问题是，无论client_max_body_size设置在哪里，nginx －s reload后，依然一直报413.多次尝试reload，始终无效。最终决定kill 进程，restart，终于好了。
+ 
+## nginx常用命令
+
+#### 检查配置是否正确
+
+```shell script
+./nginx -t
+```
+
+#### 启动、停止、重启nginx
+

@@ -1,8 +1,8 @@
 ---
 title: nginx能做什么
 date: 2018-09-12 17:14:54
-categories: Nginx
-tags: nginx能做什么
+categories: nginx
+tags:
 ---
 
 ## 前言
