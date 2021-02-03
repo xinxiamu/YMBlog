@@ -82,3 +82,28 @@ flush privileges;
 参考：
 https://www.jianshu.com/p/fc40067c4dc9      
 https://jingyan.baidu.com/article/fc07f989c5c6bd52fee5192c.html 
+
+
+1.分组查询报错
+
+错误：
+
+> 1055 - Expression #1 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'service_abs_ss_local.hta.id' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+
+解决方案：
+
+参考：
+
+https://blog.csdn.net/qq_42175986/article/details/82384160
+
+## 创建用户，授权
+
+```shell script
+CREATE USER 'jinnuo_root'@'%' IDENTIFIED BY 'a1234567';
+grant select,insert,update,references,delete,create,drop,alter,index,trigger,create routine,alter routine,execute,create view,show view,lock tables,event on jinnuo.*  to  jinnuo_root;
+flush  privileges;
+ALTER USER 'jinnuo_root'@'%' IDENTIFIED WITH mysql_native_password BY 'a1234567';
+flush privileges;
+```
+
+
