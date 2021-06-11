@@ -34,3 +34,19 @@ https://www.jianshu.com/p/c35b939c5270
     git config --system --unset credential.helper
     
 之后再进行git操作时，弹出用户名密码窗口，输入即可
+
+## SSL验证无法连接仓库
+
+问题：
+
+```shell
+14:54:32.297: [java-core] git -c credential.helper= -c core.quotepath=false -c log.showSignature=false push --progress --porcelain origin refs/heads/master:master
+fatal: unable to access 'https://github.com/xinxiamu/java-core.git/': OpenSSL SSL_read: Connection was reset, errno 10054
+```
+
+解决：
+
+执行下面命令，然后再继续后面命令即可：
+```shell
+git config --global http.sslVerify "false"
+```

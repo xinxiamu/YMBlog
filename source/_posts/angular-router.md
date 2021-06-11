@@ -172,8 +172,114 @@ RouterState 中的每个 ActivatedRoute 都提供了从任意激活路由开始�
 学习参考：
 
 - https://angular.cn/guide/router#base-href
+
+-------------------------------------------------------------------
+
+## 路由传参
+
+#### 情景一：
+
+路径：http://localhost:8080/#/product/1 
+
+跳转传参：
+
+方式一
+```typescript
+this.router.navigate(['/product/2']);
+```
+
+方式二： 
+```html
+<a [routerLink]="['/details', item.id]">
+{{item.nameEn}}
+</a>
+```
+
+获取参数值
+
+方式一： 
+```typescript
+this.productId = this.routeInfo.snapshot.params['id'];
+```
+
+方式二：  
+```typescript
+this.routeInfo.params.subscribe((params: Params) => this.productId = params['id'])
+```
+
+#### 情景二
+
+路径：http://localhost:8080/#/product?a=11&b=33
+
+传参：
+```typescript
+this.router.navigate(['list'], {queryParams: {menuName: nameEn}});
+```
+
+获取参数：
+```typescript
+this._menuName = this.route.snapshot.queryParams.menuName;
+```
+
+#### Angualr routerLink 两种传参方法及参数的使用
+
+1.路径：http://localhost:8080/#/product?id=1
+
+```html
+<a [routerLink]="['/product']" [queryParams]="{id:1}">详情</a>
+```
+
+```typescript
+//获取参数值
+this.productId = this.routeInfo.snapshot.queryParams['id'];
+```
+
+2.路径：http://localhost:8080/#/product/1
+
+```html
+<a [routerLink]="['/product',1]">产品</a>
+```
+
+```typescript
+//获取参数值
+this.productId = this.routeInfo.snapshot.params['id'];
+ //另一种方式参数订阅
+this.routeInfo.params.subscribe((params: Params) => this.productId = params['id']);
+```
+
+这种需要配置路由：
+
+```typescript
+const routes: Routes =[
+    {path: 'product/:id',component: ProductComponent}
+];
+```
+
+## 重新加载路由的问题
+
+问题描述：   
+>同一个路由，当前路由下，路由参数变化，不会重新加载页面，即不会重新执行onInit方法。
+
+解决办法：   
+在AppComponet添加如下代码：
+```typescript
+// 处理同一个路由，参数变化，不会重新加载界面的问题。
+// tslint:disable-next-line:only-arrow-functions
+this.router.routeReuseStrategy.shouldReuseRoute = function() {
+    return false;
+};
+this.router.events.subscribe((evt) => {
+
+    if (evt instanceof NavigationEnd) {
+        this.router.navigated = false;
+        window.scrollTo(0, 0);
+    }
+});
+```
+
+
+
     
 
      
-    
     
