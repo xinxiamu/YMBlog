@@ -229,3 +229,30 @@ $ mvn help:all-profiles 列出当前所有的Profile
 
 可以看到里面代理了很多第三方私服，阿里云的，spring的，等。然后整合到`maven-pblic`group组中即可。
 
+## maven配置修改，指定java环境
+
+```shell
+[root@iZ7xvc7no7w1i3tcdv8wkgZ bin]# pwd
+/server/java/maven/bin
+[root@iZ7xvc7no7w1i3tcdv8wkgZ bin]# ls
+m2.conf  mvn  mvn.cmd  mvnDebug  mvnDebug.cmd  mvnyjp
+[root@iZ7xvc7no7w1i3tcdv8wkgZ bin]# 
+
+```
+
+编辑`mvn`文件：
+
+```shell
+# -----------------------------------------------------------------------------
+# Apache Maven Startup Script
+#
+# Environment Variable Prerequisites
+#
+#   JAVA_HOME       Must point at your Java Development Kit installation.
+#   MAVEN_OPTS      (Optional) Java runtime options used when Maven is executed.
+#   MAVEN_SKIP_RC   (Optional) Flag to disable loading of mavenrc files.
+# -----------------------------------------------------------------------------
+JAVA_HOME=/server/java/jdk-11.0.7
+```
+
+`JAVA_HOME`配置java环境。
