@@ -131,10 +131,92 @@ docker仓库： [hub repo](https://hub.docker.com/)
 4.启动nginx容器
 
     docker run --name nginx -d -p 80:80 -v /server/data/nginx/html:/usr/share/nginx/html:ro -v /server/data/nginx/logs:/var/log/nginx -v /server/data/nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro -v /server/data/nginx/conf.d:/etc/nginx/conf.d -v /server/data/nginx/cache:/var/cache/nginx -v /server/data/nginx/pid:/var/run -d nginx
+
+5.启动nginx容器，ssl证书配置运行
+
+```shell
+docker run --name nginx -d -p 80:80 -p 443:443 -v /server/data/nginx/.ssl:/etc/nginx/.ssl -v /server/data/nginx/html:/usr/share/nginx/html:ro -v /server/data/nginx/logs:/var/log/nginx -v /server/data/nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro -v /server/data/nginx/conf.d:/etc/nginx/conf.d -v /server/data/nginx/cache:/var/cache/nginx -v /server/data/nginx/pid:/var/run -d nginx
+```
+
+ssl证书配置示例：
+
+按上面映射的卷，把ssl证书放在`/server/data/nginx/.ssl`下面。然后添加下面配置如：
+
+```shell
+upstream it-books.cn {
+    server 172.31.94.241:81;
+}
+server {
+    listen 443 ssl;
+    server_name  it-books.cn;
+    proxy_read_timeout 3000s; 
+    client_max_body_size 1024m;
+    client_header_buffer_size 512k;
+    large_client_header_buffers 20  512k;
+    gzip on;
+    gzip_buffers 32 4K;
+    gzip_comp_level 6;
+    gzip_min_length 400;
+    gzip_types text/plain application/xml application/javascript;
+    gzip_vary on;
+    add_header X-Content-Type-Options nosniff;
+    ssl_certificate /etc/nginx/.ssl/server.pem;
+    ssl_certificate_key /etc/nginx/.ssl/server.key;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers 'CHACHA20:EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH:ECDHE-RSA-AES128-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA128:DHE-RSA-AES128-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA128:ECDHE-RSA-AES128-SHA384:ECDHE-RSA-AES128-SHA128:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES128-SHA128:DHE-RSA-AES128-SHA128:DHE-RSA-AES128-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA384:AES128-GCM-SHA128:AES128-SHA128:AES128-SHA128:AES128-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4;';
+    ssl_prefer_server_ciphers on;   
+    ssl_session_cache shared:SSL:10m;   
+    ssl_session_timeout 60m;    
+    proxy_intercept_errors on;
+    location / {
+        index index.html index.htm index.jsp;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header   Host   $http_host;
+        proxy_connect_timeout 300s;
+        proxy_send_timeout 300s;
+		proxy_read_timeout 3000s; 
+        client_max_body_size 1024m;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Http-scheme https;
+        proxy_pass http://it-books.cn;
+        add_header Access-Control-Allow-Origin *;
+		add_header Access-Control-Allow-Methods POST,GET,OPTIONS;
+        add_header X-UA-Compatible 'IE=EmulateIE7';
+        add_header X-UA-Compatible 'IE=EmulateIE8';
+        add_header X-UA-Compatible 'IE=EmulateIE9';
+        add_header X-UA-Compatible 'IE=EmulateIE10';
+        add_header X-UA-Compatible 'IE=EmulateIE11';
+        add_header  X-UA-Compatible 'IE=Edge,chrome=1';
+        server_name_in_redirect off; 
+	
+    }
+    
+    error_page  500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   html;
+    }  
+    error_page   404  /404.html;
+    location = /404.html {
+        root   html;
+    }
+}
+server {
+	listen 80;
+	proxy_read_timeout 3000s; 
+	client_max_body_size 1024m;
+	server_name it-books.cn;
+	rewrite ^(.*)$ https://$host$1 permanent;
+	
+	location / {
+        index index.html index.htm;
+    }
+}
+```
     
 成功启动后，就可以打开浏览器测试：http://ip或者http://域名
 
-5.中文乱码问题
+6.中文乱码问题
 
 如果发现中文乱码，修改server的配置内容，增加一行：charset utf-8;  
 
@@ -154,7 +236,7 @@ docker仓库： [hub repo](https://hub.docker.com/)
       
 然后重启nginx。最后，在浏览器上Ctrl+F5，刷新，一切正常！
 
-6.反向代理失败问题
+7.反向代理失败问题
 
     upstream abs-demo.xcsqjr.com{
         ip_hash;
