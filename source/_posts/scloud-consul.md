@@ -140,4 +140,48 @@ ndoe4  172.21.0.5:8301  alive   client  1.4.0  2         dc1  <default>
 
 [下载demo](https://github.com/xinxiamu/mu-spring-cloud-sample/tree/master/spring-cloud-consul)
 
+1.服务和消费端加上依赖：
+```shell
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+</dependency>
+```
 
+2.在启动类中加上注解：    
+`@EnableDiscoveryClient`
+
+3.配置.yml
+
+消费者的：
+```shell
+server:
+  port: 8001
+spring:
+  application:
+    name: consul-service
+  cloud:
+    consul:
+      port: 8500
+      host: 192.168.0.3
+      discovery:
+        service-name: ${spring.application.name}
+        prefer-ip-address: true
+#        instance-id: ${spring.application.name}-id
+```
+
+消费者的：
+```shell
+server:
+  port: 8080
+spring:
+  application:
+    name: consul-consumer
+  cloud:
+    consul:
+      host: 192.168.0.3
+      port: 8500
+      discovery:
+        service-name: ${spring.application.name}
+        register: false #不注册到consul
+```
