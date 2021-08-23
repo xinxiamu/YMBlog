@@ -646,7 +646,7 @@ Zabbix监控Java应用程序的关键点在于：配置Zabbix-JavaGateway、让Z
 
 启动容器：
 
-    docker run --name ymu-jenkins -p 3001:8080 -p 50000:50000 --env JAVA_OPTS="-Djava.util.logging.config.file=/var/jenkins_home/log.properties" -v /server/data/jenkins:/var/jenkins_home -d jenkins/jenkins:lts
+    docker run --name ymu-jenkins -p 3001:8080 -p 50000:50000 --env JAVA_OPTS="-Djava.util.logging.config.file=/var/jenkins_home/log.properties" -v /server/data/jenkins:/var/jenkins_home -d jenkins/jenkins:lts-jdk11
 
 lts：长期支持版本    
 以上启动的容器安装Locale插件后，也只能部分中文，原因：未知……

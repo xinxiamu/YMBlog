@@ -2,7 +2,7 @@
 title: spring-cloud-feign在使用中遇到的一些问题
 date: 2017-09-24 21:53:46
 categories: spring-cloud
-tags: feign使用常见问题
+tags:
 ---
 
 ## 1. feign的接口继承特性

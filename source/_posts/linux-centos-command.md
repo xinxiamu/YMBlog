@@ -607,4 +607,57 @@ systemctl start firewalld.service
 systemctl stop firewalld.service
 ```
 
+## CentOS7安装源配置详解
+
+源配置目录及默认配置文件
+
+```shell
+/etc/yum.repos.d/
+/etc/yum.repos.d/CentOS-Base.repo
+```
+
+修改安装源
+
+1.备份
+```shell
+# mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+```
+
+2.从阿里云下载新的CentOS-Base.repo 到/etc/yum.repos.d/
+
+centos7
+
+```shell
+# wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+```
+
+或者：
+
+```shell
+# curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+```
+
+centos6
+
+```shell
+# wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-6.repo
+```
+
+或者：
+
+```shell
+# curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-6.repo
+```
+
+3.之后生成缓存
+
+```shell
+# yum makecache
+```
+
+4.更新缓存并安装常用工具
+```shell
+# yum makecache
+# yum install -y wget net-tools vim chrony rsync
+```
 
