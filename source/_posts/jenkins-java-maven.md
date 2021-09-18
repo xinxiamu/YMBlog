@@ -15,6 +15,25 @@ http://www.jianshu.com/p/a7d7df97fe4b
 - 运行 `java -jar jenkins.war --httpPort=8080.`
 - 在浏览器访问 http://localhost:8080. 记得开防火墙。
 
+_启动异常1：_
+```shell
+java.lang.NullPointerException
+	at java.desktop/sun.awt.FontConfiguration.getVersion(FontConfiguration.java:1262)
+	at java.desktop/sun.awt.FontConfiguration.readFontConfigFile(FontConfiguration.java:225)
+	at java.desktop/sun.awt.FontConfiguration.init(FontConfiguration.java:107)
+	at java.desktop/sun.awt.X11FontManager.createFontConfiguration(X11FontManager.java:719)
+	at java.desktop/sun.font.SunFontManager$2.run(SunFontManager.java:367)
+	at java.base/java.security.AccessController.doPrivileged(Native Method)
+	at java.desktop/sun.font.SunFontManager.<init>(SunFontManager.java:312)
+	at java.desktop/sun.awt.FcFontManager.<init>(FcFontManager.java:35)
+	at java.desktop/sun.awt.X11FontManager.<init>(X11FontManager.java:56)
+```
+以上异常是爆的字体问题异常。
+
+解决方法：
+执行命令安装`yum install fontconfig`
+
+
 图一：
 {% asset_img a.png %}
 

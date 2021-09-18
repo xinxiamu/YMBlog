@@ -126,4 +126,37 @@ WARNING: sanitizing HTML stripped some content (see http://g.co/ng/security#xss)
 <span [innerHTML]="sanitizer.bypassSecurityTrustHtml(detailsInfo.description)"></span>
 ```
 
+## 无法加载文件 F:\angular\Material\material-basic\node_modules\.bin\ng.ps1，因为在此系统上禁止运行脚本
+
+问题描述：
+
+```shell
+PS F:\angular\Material\material-basic> ng version
+ng : 无法加载文件 F:\angular\Material\material-basic\node_modules\.bin\ng.ps1，因为在此系统上禁止运行脚本。有关详细信息，请参阅 https:/go.microsoft.com/fwlink/?LinkID=135170 中的 about_Execution_Policies。
+所在位置 行:1 字符: 1
++ ng version
++ ~~
+    + CategoryInfo          : SecurityError: (:) []，PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+```
+
+解决方法：
+
+不是cmd命令提示符（通过这个不行），而是通过管理员打开power shell , win10打开方式之一：具体操作先快捷键 win+S,然后输入power shell,点击已管理员身份运行
+
+_注意：_必须以管理员身份打开。
+
+然后输入命令：
+`set-executionpolicy remotesigned`
+
+最后选择，输入`yes`
+
+```shell
+PS C:\Users\Administrator> set-executionpolicy remotesigned
+
+执行策略更改
+执行策略可帮助你防止执行不信任的脚本。更改执行策略可能会产生安全风险，如 https:/go.microsoft.com/fwlink/?LinkID=135170
+中的 about_Execution_Policies 帮助主题所述。是否要更改执行策略?
+[Y] 是(Y)  [A] 全是(A)  [N] 否(N)  [L] 全否(L)  [S] 暂停(S)  [?] 帮助 (默认值为“N”): y
+```
 
