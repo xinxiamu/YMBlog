@@ -10,15 +10,16 @@ tags:
 ## 安装-Docker环境下
 
 ```shell script
-docker run -p 9000:9000 \
+docker run -p 9000:9000 -p 9001:9001 \
 --restart=always \
 --name minio1 \
 -v /mnt/data:/data \
 -e "MINIO_ROOT_USER=izajzo6yycy5d65vexjmdvtts" \
 -e "MINIO_ROOT_PASSWORD=kvb9fv35c14soranzsz8bwzyf" \
--d minio/minio server /data
+-d minio/minio server /data --console-address ":9001"
 ```
 
+安装完毕，可以浏览器打开管理界面：http://localhost:9001
 
 ## 客户端使用
 
@@ -35,7 +36,9 @@ windows exe文件：https://pan.baidu.com/s/1DxO0MgXqtEVg40FgiyL1CQ
 2.设置自定义命令并启动
 
 ```text
-Linux下： alias mc="./mc"
+Linux下： 
+chmod +x ./mc
+alias mc="./mc"
 
 windows下： mc.exe
 ```
@@ -53,52 +56,51 @@ secretKey:  password
 ```
 
 ```shell script
-[root@xc-product-server-hn002 ~]# mc config host add minio http://192.168.0.49:4369 izajzo6yycy5d65vexjmdvtts kvb9fv35c14soranzsz8bwzyf
-mc: Configuration written to `/root/.mc/config.json`. Please update your access credentials.
-mc: Successfully created `/root/.mc/share`.
-mc: Initialized share uploads `/root/.mc/share/uploads.json` file.
-mc: Initialized share downloads `/root/.mc/share/downloads.json` file.
-Added `minio` successfully.
+[root@xr-server-dev minio]# ls
+mc
+[root@xr-server-dev minio]# ./mc config host add minio1 http://192.168.0.3:9000 izajzo6yycy5d65vexjmdvtts kvb9fv35c14soranzsz8bwzyf
+Added `minio1` successfully.
 ```
 
 查看：
 
 ```shell script
-[root@xc-product-server-hn002 ~]# ./mc config host list
-gcs  
+[root@xr-server-dev minio]# ./mc config host list
+gcs   
   URL       : https://storage.googleapis.com
   AccessKey : YOUR-ACCESS-KEY-HERE
   SecretKey : YOUR-SECRET-KEY-HERE
   API       : S3v2
   Path      : dns
 
-local
+local 
   URL       : http://localhost:9000
   AccessKey : 
   SecretKey : 
   API       : 
   Path      : auto
 
-minio
-  URL       : http://192.168.0.49:4369
+minio1
+  URL       : http://192.168.0.3:9000
   AccessKey : izajzo6yycy5d65vexjmdvtts
   SecretKey : kvb9fv35c14soranzsz8bwzyf
   API       : s3v4
   Path      : auto
 
-play 
+play  
   URL       : https://play.min.io
   AccessKey : Q3AM3UQ867SPQQA43P2F
   SecretKey : zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
   API       : S3v4
   Path      : auto
 
-s3   
+s3    
   URL       : https://s3.amazonaws.com
   AccessKey : YOUR-ACCESS-KEY-HERE
   SecretKey : YOUR-SECRET-KEY-HERE
   API       : S3v4
   Path      : dns
+
 
 ```
 

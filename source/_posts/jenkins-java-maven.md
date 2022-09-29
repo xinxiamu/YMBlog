@@ -13,6 +13,7 @@ http://www.jianshu.com/p/a7d7df97fe4b
 ## 1. 安装并运行jenkins-war
 - [下载](https://jenkins.io/download/)
 - 运行 `java -jar jenkins.war --httpPort=8080.`
+- 后台运行 `nohup java -jar jenkins.war --httpPort=3001 &`
 - 在浏览器访问 http://localhost:8080. 记得开防火墙。
 
 _启动异常1：_

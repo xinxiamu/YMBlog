@@ -220,6 +220,44 @@ nsenter工具包含在util-linux 2.23或更高版本中。
     docker container rm trusting_newton
     docker container prune
 
+## 容器日志
+
+#### 查看容器日志
+
+1.查看容器输出日志
+```shell
+docker logs -f 容器名称或者容器id
+```
+
+2.查看容器日志最后多少行数
+```shell
+docker logs -f --tail=20 容器名称或容器id
+```
+
+#### 清理容器日志
+
+```shell
+docker inspect --format='{{.LogPath}}' <容器id或者名称>
+
+echo > 日志路径 #或者 cat /dev/null > xxx-json.log
+```
+
+#### 容器日志配置
+
+1.全局配置
+
+修改daemon.json 限定log文件的大小：
+
+```json
+{
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "200m",
+    "max-file": "3"
+  }
+}
+```
+
 ## 参考资源
 
 - http://itmuch.com/docker/05-docker-command-containers/    

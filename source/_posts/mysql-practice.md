@@ -106,4 +106,9 @@ ALTER USER 'jinnuo_root'@'%' IDENTIFIED WITH mysql_native_password BY 'a1234567'
 flush privileges;
 ```
 
+## 连接错误Public Key Retrieval is not allowed（解决方式）
+
+在url连接添加属性`allowPublicKeyRetrieval=true
+
+
 

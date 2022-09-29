@@ -29,6 +29,15 @@ https://blog.csdn.net/dream_broken/article/details/52883883
     # swapon -s   # 查看所有交换分区 
     # hdparm -i /dev/hda  # 查看磁盘参数(仅适用于IDE设备) 
     # dmesg | grep IDE  # 查看启动时IDE设备检测状况 
+
+### 磁盘空间查看
+1.df命令：
+
+- df -hl: 查看磁盘剩余空间
+- df -h: 查看每个根路径的分区大小
+- du -sh [目录名称]: 返回该目录的大小
+- du -sm [文件夹]: 返回该文件夹总M数
+- du -h [目录名]： 查看指定文件夹下所有文件大小，包含子文件夹
     
 ## 网络
 
@@ -661,3 +670,13 @@ centos6
 # yum install -y wget net-tools vim chrony rsync
 ```
 
+## linux定时清理缓存
+
+查看缓存
+```shell
+free -m 或者 free -h
+```
+
+参考：https://blog.csdn.net/weixin_43054437/article/details/108772019
+
+## linux定时计划

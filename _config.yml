@@ -69,7 +69,7 @@ theme: BlueLake
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: https://github.com/xinxiamu/xinxiamu.github.io.git
+  repo: https://xinxiamu:111111111@github.com/xinxiamu/xinxiamu.github.io.git
   branch: master
 
 # 搜索

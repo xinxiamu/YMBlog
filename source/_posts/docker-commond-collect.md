@@ -7,6 +7,16 @@ tags:
 
 ### 容器
 
+#### 更改已启动容器属性
+
+比如，如果在启动容器时候忘记设定随docker服务启动而自启动，那么可以执行以下命令更改属性：
+
+更改容器`jenkins`启动属性：
+```shell
+docker update --restart=always jenkins # 设置自启动
+docker update --restart=no jenkins # 取消自启动
+```
+
 #### 查看容器端口映射
 
     [root@sqjr-client-demo-server1-hn zookeeper]# docker port zk-server1
@@ -97,4 +107,12 @@ docker run -rm -p 1111:1111  192.168.0.3:8082/xrlj/eureka-server:0.0.1
 ```
 
 关闭运行后，会自动删除，不会创建容器。
+
+#### 查看容器id，判断容器是否存在
+
+```shell
+docker inspect --format="{{.Id}}" 容器名称
+```
+
+容器存在，输出容器id。不存在，则报错
                 
