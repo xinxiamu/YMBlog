@@ -9,6 +9,149 @@ tags:
 
 docker仓库： [hub repo](https://hub.docker.com/)
 
+## 安装ubuntu
+
+执行命令运行容器：
+```shell
+docker run --name ubuntu -p 50033:22 -i -t ubuntu:16.04 /bin/bash
+```
+
+更新：
+```shell
+root@1005d50aab7e:/# apt-get updat
+```
+
+进到ubuntu系统后，更改源：
+
+先备份：
+```shell
+root@b6b63dd24940:/# cp /etc/apt/sources.list /etc/apt/sources-bak.list
+```
+再添加国内源：
+```shell
+gedit /etc/apt/sources.list
+```
+
+追加下面内容：
+```text
+deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
+
+deb http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse
+
+deb http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse
+
+deb http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse
+
+deb http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
+deb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
+```
+
+保存退出：wq！
+
+安装ssh远程登录服务：
+```shell
+apt-get install openssh-server
+```
+
+查看ssh启动状态：
+```shell
+root@1005d50aab7e:/# service ssh status
+ * sshd is not running
+```
+
+如果没启动，则启动：
+```shell
+service ssh start
+```
+
+更改root密码：
+```shell
+root@1005d50aab7e:/# passwd root
+Enter new UNIX password: 
+Retype new UNIX password: 
+passwd: password updated successfully
+```
+
+更改配置，允许root远程登录：
+```shell
+root@1005d50aab7e:/# vim /etc/ssh/sshd_config
+```
+把`PermitRootLogin prohibit-password`更改为：`PermitRootLogin yes`
+
+最后退出。然后重新启动ubuntu容器：
+```shell
+[root@server-dev-01 ~]# docker ps -a
+CONTAINER ID        IMAGE                       COMMAND                  CREATED             STATUS                      PORTS                                                                                                                      NAMES
+1005d50aab7e        ubuntu:16.04                "/bin/bash"              9 minutes ago       Exited (0) 45 seconds ago                                                                                                                              ubuntu
+e8e0f17ea8e3        mysql:8.0.13                "docker-entrypoint.s…"   3 years ago         Up 28 minutes               3306/tcp, 33060/tcp, 0.0.0.0:3912->3912/tcp                                                                                mysql-slave2
+3414c0aff239        mysql:8.0.13                "docker-entrypoint.s…"   3 years ago         Up 28 minutes               3306/tcp, 33060/tcp, 0.0.0.0:3911->3911/tcp                                                                                mysql-slave1
+cad4c3dabbb4        mysql:8.0.13                "docker-entrypoint.s…"   3 years ago         Up 28 minutes               3306/tcp, 33060/tcp, 0.0.0.0:3910->3910/tcp                                                                                mysql-master
+1779f187c955        nginx                       "nginx -g 'daemon of…"   3 years ago         Up 28 minutes               0.0.0.0:80->80/tcp                                                                                                         nginx
+06591262adaf        rabbitmq:3.7.8-management   "docker-entrypoint.s…"   3 years ago         Up 28 minutes               0.0.0.0:4369->4369/tcp, 0.0.0.0:5671-5672->5671-5672/tcp, 0.0.0.0:15671-15672->15671-15672/tcp, 0.0.0.0:25672->25672/tcp   rabbitmq
+3ae312877190        redis                       "docker-entrypoint.s…"   3 years ago         Up 28 minutes               6379/tcp, 0.0.0.0:6380->6380/tcp                                                                                           redis-6380
+[root@server-dev-01 ~]# docker start ubuntu 
+ubuntu
+[root@server-dev-01 ~]# clear
+[root@server-dev-01 ~]# docker ps
+CONTAINER ID        IMAGE                       COMMAND                  CREATED             STATUS              PORTS                                                                                                                      NAMES
+1005d50aab7e        ubuntu:16.04                "/bin/bash"              9 minutes ago       Up 3 seconds        0.0.0.0:50033->22/tcp                                                                                                      ubuntu
+e8e0f17ea8e3        mysql:8.0.13                "docker-entrypoint.s…"   3 years ago         Up 28 minutes       3306/tcp, 33060/tcp, 0.0.0.0:3912->3912/tcp                                                                                mysql-slave2
+3414c0aff239        mysql:8.0.13                "docker-entrypoint.s…"   3 years ago         Up 28 minutes       3306/tcp, 33060/tcp, 0.0.0.0:3911->3911/tcp                                                                                mysql-slave1
+cad4c3dabbb4        mysql:8.0.13                "docker-entrypoint.s…"   3 years ago         Up 28 minutes       3306/tcp, 33060/tcp, 0.0.0.0:3910->3910/tcp                                                                                mysql-master
+1779f187c955        nginx                       "nginx -g 'daemon of…"   3 years ago         Up 28 minutes       0.0.0.0:80->80/tcp                                                                                                         nginx
+06591262adaf        rabbitmq:3.7.8-management   "docker-entrypoint.s…"   3 years ago         Up 28 minutes       0.0.0.0:4369->4369/tcp, 0.0.0.0:5671-5672->5671-5672/tcp, 0.0.0.0:15671-15672->15671-15672/tcp, 0.0.0.0:25672->25672/tcp   rabbitmq
+3ae312877190        redis                       "docker-entrypoint.s…"   3 years ago         Up 28 minutes       6379/tcp, 0.0.0.0:6380->6380/tcp                                                                                           redis-6380
+[root@server-dev-01 ~]# 
+```
+
+用xshell远程登录，登录失败了，呜呜……
+
+进入容器：
+```shell
+[root@server-dev-01 ~]# docker exec -it ubuntu /bin/bash
+root@1005d50aab7e:/# ls
+bin   dev  home  lib64  mnt  proc  run   srv  tmp  var
+boot  etc  lib   media  opt  root  sbin  sys  usr
+root@1005d50aab7e:/# service ssh status
+ * sshd is not running
+root@1005d50aab7e:/# 
+```
+
+发现ssh服务没有启动。下面启动ssh服务：
+```shell
+root@1005d50aab7e:/# service ssh start
+ * Starting OpenBSD Secure Shell server sshd                             [ OK ] 
+root@1005d50aab7e:/# ps -e|grep ssh
+   66 ?        00:00:00 sshd
+```
+
+出现`sshd`,已经启动ssh服务。
+
+设置ssh服务自动启动，否则下次启动容器，又要手动启动ssh服务。
+```shell
+[root@server-dev-01 ~]# docker exec -it ubuntu /bin/bash
+root@1005d50aab7e:/# service ssh status
+ * sshd is not running
+root@1005d50aab7e:/# /etc/init.d/ssh start
+ * Starting OpenBSD Secure Shell server sshd                             [ OK ] 
+root@1005d50aab7e:/# sudo systemctl enable ssh
+bash: sudo: command not found
+root@1005d50aab7e:/# systemctl enable ssh
+Synchronizing state of ssh.service with SysV init with /lib/systemd/systemd-sysv-install...
+Executing /lib/systemd/systemd-sysv-install enable ssh
+root@1005d50aab7e:/#
+```
+
+貌似docker重启ubuntu容器，ssh还是不能自动启动ssh，那就手动启动吧，日的……
+
+再用xshell登录看下：成功登录了，恭喜！
+
+
+
 ## 安装nginx
 
 参考：
