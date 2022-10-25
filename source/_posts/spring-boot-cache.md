@@ -189,6 +189,8 @@ User getUser(Integer id);
 
 该属性用来指定是否使用异步模式，该属性默认值为`false`，默认为同步模式。异步模式指定`sync = true`即可，异步模式下`unless`属性不可用。
 
+sync：当值为true时，相当于添加了本地锁，可以有效地解决缓存击穿问题
+
 ####  @CachePut
 
 该注解表示，不管缓存有没有，都会把方法返回的结果写入到缓存中。如果缓存已经存在，那么该key的缓存将会被覆盖，所以适用于缓存更新。
@@ -265,9 +267,46 @@ public @interface CacheEvict {
 
 是否在方法执行成功之后触发键删除操作，默认是在对应方法成功执行之后触发的，若此时方法抛出异常而未能成功返回，不会触发清除操作。指定该属性值为`true`时，Spring会在调用该方法之前清除缓存中的指定元素。
 
+#### @Caching（不常用）
+
+@Caching 注解可以在一个方法或者类上同时指定多个Spring Cache相关的注解。
+
+其拥有三个属性：cacheable、put 和 evict，分别用于指定@Cacheable、@CachePut 和 @CacheEvict。对于一个数据变动，更新多个缓存的场景，可以通过 @Caching 来实现：
+```java
+@Caching(cacheable = @Cacheable(cacheNames = "caching", key = "#age"), evict = @CacheEvict(cacheNames = "t4", key = "#age"))
+public String caching(int age) {
+    return "caching: " + age + "-->" + UUID.randomUUID().toString();
+}
+```
+上面组合操作：
+- 从`caching::age`缓存取数据，不存在时执行方法并写入缓存
+- 失效缓存`t4::age`
+
+#### @CacheConfig（不常用）
+
+如果一个类中，多个方法都有同样的`cacheName`，`keyGenerator`，`cacheManager`和`cacheResolver`，可以直接使用`@CacheConfig`注解在类上声明，这个类中的方法都会使用`@CacheConfig`属性设置的相关配置。
+```java
+@Component
+@CacheConfig(cacheNames = "mall_cache")
+public class CacheComponent {
+
+	
+    @Cacheable(key = "'perm-whitelist-'+#clientId", unless="#result == null")
+    public List<String> cacheWriteList(String clientId){
+    	...
+    }
+       
+     @Cacheable(key = "'perm-cutom-aci-' + #tenantId + '-' + #roleId + '-' + #tenantLevel + '-' + #subType", unless="#result == null")
+    public List<RequestDto> cacheRequest(Long tenantId,Long roleId,Integer tenantLevel,Integer subType){
+        ...
+    }
+}
+
+```
+
 ### 原理
 
-dddd
+原理，原理，原理……
 
 
 ## spring-cache集成Ehcache做本地缓存
@@ -278,7 +317,330 @@ dddd
 
 [Caffeine](https://github.com/ben-manes/caffeine)
 
+1. 引入相关jar：
+```text
+<!--加入spring cache-->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-cache</artifactId>
+</dependency>
+<!--集成本地缓存框架caffeine-->
+<dependency>
+    <groupId>com.github.ben-manes.caffeine</groupId>
+    <artifactId>caffeine</artifactId>
+    <version>3.1.1</version>
+</dependency>
+```
+
+2. 配置类：
+```java
+package com.example.demo;
+
+import com.github.benmanes.caffeine.cache.Caffeine;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
+import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+
+@Configuration
+public class CacheConfig {
+
+    /**
+     * 缓存自定义key生成器
+     * @return
+     */
+    @Bean("myKeyGenerator")
+    public KeyGenerator keyGenerator(){
+        return new KeyGenerator(){
+
+            @Override
+            public Object generate(Object target, Method method, Object... params) {
+                return method.getName()+ Arrays.asList(params).toString();
+            }
+        };
+    }
+
+    /**
+     * 支持 lambda 表达式编写
+     */
+    /*@Bean("myKeyGenerator")
+    public KeyGenerator keyGenerator(){
+        return ( target,  method, params)-> method.getName()+ Arrays.asList(params).toString();
+    }*/
+
+    /**
+     * 配置缓存管理器
+     * @return 缓存管理器
+     */
+    @Bean("caffeineCacheManager")
+    public CacheManager cacheManager() {
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
+        cacheManager.setCaffeine(Caffeine.newBuilder()
+                // 最后一次写入后经过固定时间过期300秒
+                .expireAfterWrite(100, TimeUnit.SECONDS)
+                // 初始的缓存空间大小
+                .initialCapacity(100)
+                // 缓存的最大条数
+                .maximumSize(1000));
+        return cacheManager;
+    }
+
+    /**
+     * 相当于在构建LoadingCache对象的时候 build()方法中指定过期之后的加载策略方法
+     * 必须要指定这个Bean，refreshAfterWrite=60s属性才生效
+     * @return
+     */
+    /*@Bean
+    public CacheLoader<String, Object> cacheLoader() {
+        CacheLoader<String, Object> cacheLoader = new CacheLoader<String, Object>() {
+            @Override
+            public Object load(String key) throws Exception {
+                return null;
+            }
+            // 重写这个方法将oldValue值返回回去，进而刷新缓存
+            @Override
+            public Object reload(String key, Object oldValue) throws Exception {
+                return oldValue;
+            }
+        };
+        return cacheLoader;
+    }
+
+    @Bean
+    public Cache<String, Object> cache(CacheLoader<String, Object> cacheLoader) {
+        return Caffeine.newBuilder()
+                // 创建缓存或者最近一次更新缓存后经过固定的时间间隔，刷新缓存 最后一次写入后经过固定时间过期
+                .refreshAfterWrite(5, TimeUnit.SECONDS)
+                // 初始的缓存空间大小
+                .initialCapacity(100)
+                // 缓存的最大条数
+                .maximumSize(10000)
+                //软引用
+                .softValues()
+                .build(cacheLoader);
+    }*/
+}
+
+```
+
 ## spring-cache-redis分布式缓存
+
+#### 添加相关依赖
+
+在`pom.xml`文件添加：
+```xml
+<!--spring cache 集成redis做缓存-->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-cache</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+    <exclusions>
+        <!--排除lettuce客户端（默认使用lettuce客户端）-->
+        <exclusion>
+            <groupId>io.lettuce</groupId>
+            <artifactId>lettuce-core</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+<!--redis连接池-->
+<dependency>
+    <groupId>redis.clients</groupId>
+    <artifactId>jedis</artifactId>
+</dependency>
+```
+
+#### redis配置
+
+在`application.yml`添加`redis`配置文件：
+```yaml
+spring:
+  redis:
+    database: 0
+    host: 192.168.0.106
+    port: 6380
+    password: a1234567
+    jedis:
+      pool:
+        # 连接池中的最大空闲连接 默认8
+        max-idle: 8
+        # 连接池中的最小空闲连接 默认0
+        min-idle: 0
+        # 连接池最大连接数 默认8 ，负数表示没有限制
+        max-active: 8
+        # 连接池最大阻塞等待时间（使用负值表示没有限制） 默认-1
+        max-wait: -1
+    timeout: 3000
+  cache:
+    type: redis   # 指定使用的缓存类型
+      # redis:    当自定义ChacheManager时，就这里的配置不需要配置，配置了也不起作用
+      #   use-key-prefix: true
+      #  key-prefix: "demo:"
+      #  time-to-live: 60000  #缓存超时时间 单位：ms
+      #  cache-null-values: false #是否缓存空值
+    cache-names: user
+cache:
+  ttl: '{"user":60,"dept":30}'  #自定义某些缓存空间的过期时间
+
+```
+
+#### 缓存配置类
+
+添加配置类如下：
+```java
+package com.example.demo;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.cache.interceptor.SimpleKeyGenerator;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+@Configuration
+public class RedisConfiguration {
+
+    // ${cache} 获取配置文件的配置信息   #{}是spring表达式，获取Bean对象的属性
+    @Value("#{${cache.ttl}}")
+    private Map<String, Long> ttlParams;
+
+    /**
+     * @param redisConnectionFactory
+     * @功能描述 redis作为缓存时配置缓存管理器CacheManager，主要配置序列化方式、自定义
+     * <p>
+     * 注意：配置缓存管理器CacheManager有两种方式：
+     * 方式1：通过RedisCacheConfiguration.defaultCacheConfig()获取到默认的RedisCacheConfiguration对象，
+     * 修改RedisCacheConfiguration对象的序列化方式等参数【这里就采用的这种方式】
+     * 方式2：通过继承CachingConfigurerSupport类自定义缓存管理器，覆写各方法，参考：
+     * https://blog.csdn.net/echizao1839/article/details/102660649
+     * <p>
+     * 切记：在缓存配置类中配置以后，yaml配置文件中关于缓存的redis配置就不会生效，如果需要相关配置需要通过@value去读取
+     */
+    @Bean
+    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig();
+        redisCacheConfiguration = redisCacheConfiguration
+                // 设置key采用String的序列化方式
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer.UTF_8))
+                //设置value序列化方式采用jackson方式序列化
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer()))
+                //当value为null时不进行缓存
+                .disableCachingNullValues()
+                // 配置缓存空间名称的前缀
+                .prefixCacheNameWith("demo:")
+                //全局配置缓存过期时间【可以不配置】
+                .entryTtl(Duration.ofMinutes(30L));
+        //专门指定某些缓存空间的配置，如果过期时间【主要这里的key为缓存空间名称】
+        Map<String, RedisCacheConfiguration> map = new HashMap<>();
+        Set<Map.Entry<String, Long>> entries = ttlParams.entrySet();
+        for (Map.Entry<String, Long> entry : entries) {
+            //指定特定缓存空间对应的过期时间
+//            map.put("user", redisCacheConfiguration.entryTtl(Duration.ofSeconds(10)));
+            map.put(entry.getKey(), redisCacheConfiguration.entryTtl(Duration.ofSeconds(entry.getValue())));
+        }
+        return RedisCacheManager
+                .builder(redisConnectionFactory)
+                .cacheDefaults(redisCacheConfiguration)  //默认配置
+                .withInitialCacheConfigurations(map)  //某些缓存空间的特定配置
+                .build();
+    }
+
+
+    /**
+     * 自定义缓存的redis的KeyGenerator【key生成策略】
+     * 注意: 该方法只是声明了key的生成策略,需在@Cacheable注解中通过keyGenerator属性指定具体的key生成策略
+     * 可以根据业务情况，配置多个生成策略
+     * 如: @Cacheable(value = "key", keyGenerator = "cacheKeyGenerator")
+     */
+    @Bean
+    public KeyGenerator keyGenerator() {
+        /**
+         * target: 类
+         * method: 方法
+         * params: 方法参数
+         */
+        return (target, method, params) -> {
+            //获取代理对象的最终目标对象
+            StringBuilder sb = new StringBuilder();
+            sb.append(target.getClass().getSimpleName()).append(":");
+            sb.append(method.getName()).append(":");
+            //调用SimpleKey的key生成器
+            Object key = SimpleKeyGenerator.generateKey(params);
+            return sb.append(key);
+        };
+    }
+
+
+    /**
+     * @param redisConnectionFactory：配置不同的客户端，这里注入的redis连接工厂不同： JedisConnectionFactory、LettuceConnectionFactory
+     * @功能描述 ：配置Redis序列化，原因如下：
+     * （1） StringRedisTemplate的序列化方式为字符串序列化，
+     * RedisTemplate的序列化方式默为jdk序列化（实现Serializable接口）
+     * （2） RedisTemplate的jdk序列化方式在Redis的客户端中为乱码，不方便查看，
+     * 因此一般修改RedisTemplate的序列化为方式为JSON方式【建议使用GenericJackson2JsonRedisSerializer】
+     */
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer = serializer();
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        // key采用String的序列化方式
+        redisTemplate.setKeySerializer(StringRedisSerializer.UTF_8);
+        // value序列化方式采用jackson
+        redisTemplate.setValueSerializer(genericJackson2JsonRedisSerializer);
+        // hash的key也采用String的序列化方式
+        redisTemplate.setHashKeySerializer(StringRedisSerializer.UTF_8);
+        //hash的value序列化方式采用jackson
+        redisTemplate.setHashValueSerializer(genericJackson2JsonRedisSerializer);
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        return redisTemplate;
+    }
+
+    /**
+     * 此方法不能用@Ben注解，避免替换Spring容器中的同类型对象
+     */
+    public GenericJackson2JsonRedisSerializer serializer() {
+        return new GenericJackson2JsonRedisSerializer();
+    }
+}
+
+
+```
+
+#### 开启缓存
+
+````java
+@EnableCaching //开启缓存
+@SpringBootApplication
+public class SpringRedisCacheApp {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SpringRedisCacheApp.class, args);
+    }
+}
+````
+
+#### 使用
+
+使用遵循`spring cache`规范，参考上面使用方法，这里不再重复介绍。
 
 
 ## 缓存框架JetCache
@@ -293,3 +655,29 @@ J2Cache是开源中国研发使用的一个独立的二级缓存框架，支持�
 解决频繁访问集中式缓存带来的带宽压力，相同服务的多节点缓存同步问题。
 
 [J2Cache](https://gitee.com/ld/J2Cache)
+
+## 问题
+
+这里收集一些使用缓存中出现的一些常见问题。
+
+### 缓存时间如何设置
+
+缓存的时间该设置多长呢，多长才是最合理的，考虑的因素是什么？？？
+
+### 如何对每个缓存设置不同的缓存时间
+
+实际使用中，并不是所有的缓存都统一设置成一个相同的失效时间，根据业务的需要，可能要对不同的缓存设置不同的失效时间，那么该怎么设置呢？？？？
+
+### 读模式：缓存穿透，缓存击穿，缓存雪崩
+
+缓存穿透：查询一个null数据。解决：缓存空数据：cache-null-values=true
+
+缓存击穿：大量并发请求进来同时查询一个正好过期的数据。 解决： 加锁
+
+缓存雪崩：大量的key同时过期 解决：加随机时间
+
+### 写模式 （如何保证缓存和数据库一致性）
+
+1）加锁模式
+
+2）引入canal
