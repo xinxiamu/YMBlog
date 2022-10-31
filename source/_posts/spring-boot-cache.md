@@ -642,33 +642,148 @@ public class SpringRedisCacheApp {
 
 使用遵循`spring cache`规范，参考上面使用方法，这里不再重复介绍。
 
-
-## 缓存框架JetCache
+### 缓存框架JetCache
 
 与Spring Cache类似，JetCache提供了一套操作缓存的API，可以同时支持本地和分布式缓存，但是不能支持缓存同步更新。
 
 [JetCache](https://github.com/alibaba/jetcache)
 
-## 二级缓存框架J2Cache
+#### 集成spring cache
+
+### 二级缓存框架J2Cache
 
 J2Cache是开源中国研发使用的一个独立的二级缓存框架，支持本地环境和分布式环境，并且支持缓存同步。
 解决频繁访问集中式缓存带来的带宽压力，相同服务的多节点缓存同步问题。
 
 [J2Cache](https://gitee.com/ld/J2Cache)
 
-## 问题
+**j2cache缓存同步原理：**
+
+……
+
+#### 普通使用方式
+
+1. `pom.xml`添加依赖包
+```xml
+<dependency>
+    <groupId>net.oschina.j2cache</groupId>
+    <artifactId>j2cache-core</artifactId>
+    <version>2.8.5-release</version>
+</dependency>
+<dependency>
+    <groupId>net.oschina.j2cache</groupId>
+    <artifactId>j2cache-spring-boot2-starter</artifactId>
+    <version>2.8.0-release</version>
+</dependency>
+```
+
+2. 配置文件
+新增配置文件`j2cache.properties`,内容如下：
+```properties
+# 设定一级缓存
+j2cache.L1.provider_class=caffeine
+caffeine.properties = caffeine.properties
+# 开启二级缓存
+j2cache.l2-cache-open=true
+# redis作为二级缓存
+j2cache.L2.provider_class=net.oschina.j2cache.cache.support.redis.SpringRedisProvider
+j2cache.L2.config_section=redis
+redis.hosts=192.168.0.106:6380
+redis.timeout=2000
+redis.password=a1234567
+# redis模式：单例，也可以是集群模式
+redis.mode=single
+# 缓存key的前缀,全局
+redis.namespace=j2cache
+# 一二级缓存、多应用实例缓存之间同步策略。这里用的是redis的发布订阅功能。也可以用MQ。
+j2cache.broadcast=net.oschina.j2cache.cache.support.redis.SpringRedisPubSubPolicy
+
+```
+
+新增配置文件`caffeine.properties`,内容如下：
+```properties
+#########################################
+# Caffeine configuration
+# [name] = size, xxxx[s|m|h|d]
+#########################################
+# 最多2000条内存缓存，缓存时间60秒。s-秒；m-分；h-小时；d-天
+default=2000, 60s
+rx=50, 2h
+```
+
+3. 使用代码样例：
+```java
+@Service
+public class UserService {
+
+    // 模拟数据库
+    List<User> userList = new ArrayList<>();
+
+    @Autowired
+    private CacheChannel cacheChannel;
+
+    public void add (User user) {
+        System.out.println(">>>>新增用户");
+        // 插入数据库
+        userList.add(user);
+        // 设置缓存。region理解：https://my.oschina.net/javayou/blog/3031773
+        cacheChannel.set("user", user.getName(), user);
+    }
+
+    public User get(String name){
+        System.out.println(">>>>>开始查询缓存：");
+        CacheObject user = cacheChannel.get("user", name);
+        System.out.println(">>>>>level:" + user.getLevel());
+        System.out.println(">>>>>region:" + user.getRegion());
+        System.out.println(">>>>>key:" + user.getKey());
+        System.out.println(">>>>>value:" + user.getValue());
+
+        Object value = user.getValue();
+        if (value == null) {
+            System.out.println(">>>>缓存为空，从数据库获取");
+            value = userList.get(0);
+
+            //缓存
+            if (value != null) {
+                cacheChannel.set("user", userList.get(0).getName(), value);
+            }
+        }
+
+        return (User) value;
+    }
+}
+```
+
+4. 测试
+
+`IDEA`中设定两个配置文件，端口分别`8080`和`8081`,跑起来两个实例。
+
+{%asset_img a-3.png%}
+
+测试方法：
+
+跑起来两个应用实例。用实例1新增并缓存一条数据，然后查询，可以看到读取的是缓存，第一次读的L2，后面每次都读的L1。L2会先比L1失效。
+
+在缓存还没失效时候，请求实例2的查询接口，也可以看到，同样的读取缓存的数据，当缓存失效后，再次请求读取接口会报错。因为实例2没有执行添加数据接口，所以模拟数据库存储的List数组中是没有数据的。
+
+从上面测试过程可以看出，一二级缓存同步，多个应用实例之间也同步了缓存了。
+
+那么，**缓存数据同步的原理是什么？**
+
+
+### 问题
 
 这里收集一些使用缓存中出现的一些常见问题。
 
-### 缓存时间如何设置
+#### 缓存时间如何设置
 
 缓存的时间该设置多长呢，多长才是最合理的，考虑的因素是什么？？？
 
-### 如何对每个缓存设置不同的缓存时间
+#### 如何对每个缓存设置不同的缓存时间
 
 实际使用中，并不是所有的缓存都统一设置成一个相同的失效时间，根据业务的需要，可能要对不同的缓存设置不同的失效时间，那么该怎么设置呢？？？？
 
-### 读模式：缓存穿透，缓存击穿，缓存雪崩
+#### 读模式：缓存穿透，缓存击穿，缓存雪崩
 
 缓存穿透：查询一个null数据。解决：缓存空数据：cache-null-values=true
 
@@ -676,8 +791,10 @@ J2Cache是开源中国研发使用的一个独立的二级缓存框架，支持�
 
 缓存雪崩：大量的key同时过期 解决：加随机时间
 
-### 写模式 （如何保证缓存和数据库一致性）
+#### 写模式 （如何保证缓存和数据库一致性）
 
 1）加锁模式
 
 2）引入canal
+
+#### 缓存的过期淘汰策略？
