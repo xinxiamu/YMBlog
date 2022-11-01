@@ -115,7 +115,7 @@ about:
     url: ## Your weibo's url e.g.  http://weibo.com/zhengchaooo
     title: ## Your weibo's name e.g.  秋过冬漫长
 # - label: twitter
-#   url: 
+#   url:
 #   title:
 # - label: facebook
 #   url:
@@ -139,6 +139,8 @@ links:
     url: https://crossoverjie.top/
   - title: wier的博客
     url: https://my.oschina.net/u/1859679/blog
+  - title: KL的博客
+    url: http://www.kailing.pub/
   - title: Any-Video
     url: http://www.ictgu.cn/
   - title: 在线作图
