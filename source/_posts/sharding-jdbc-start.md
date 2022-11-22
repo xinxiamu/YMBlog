@@ -39,6 +39,9 @@ tags:
 ```
 
 2. 静态读写分离配置
+
+新建配置文件`application-readwrite-dynamic.properties`，内容如下：
+
 ```properties
 #spring.shardingsphere.mode.type=Standalone
 #数据源配置 start
@@ -84,6 +87,21 @@ spring.shardingsphere.props.sql-show=true
 
 静态读写分离不是高可用的，当有从库宕机后，程序并没有主动切断并调整数据源关系，导致还是分连接请求到该宕机的mysql服务。
 所以，想要自动管理这些，就要引入高可用和动态读写的功能。
+
+配置文件`application.yml`内容如下：
+```yaml
+mybatis:
+  config-location: classpath:mybatis-config.xml
+server:
+  port: 8081
+spring:
+  profiles:
+    active: readwrite-dynamic
+```
+
+项目结构：
+
+{%asset_img a-2.png%}
 
 3. 高可用和动态数据源
 
