@@ -12,6 +12,8 @@ tags:
 
 参考： https://forezp.blog.csdn.net/article/details/94343671?spm=1001.2101.3001.6650.4&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-4-94343671-blog-121531810.pc_relevant_aa2&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-4-94343671-blog-121531810.pc_relevant_aa2&utm_relevant_index=5
 
+参考：https://lindong.blog.csdn.net/article/details/109190027?spm=1001.2101.3001.6650.1&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1-109190027-blog-126253117.pc_relevant_multi_platform_whitelistv3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1-109190027-blog-126253117.pc_relevant_multi_platform_whitelistv3&utm_relevant_index=2
+
 ## 读写分离
 
 1. 添加jar依赖

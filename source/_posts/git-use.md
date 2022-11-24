@@ -50,3 +50,16 @@ fatal: unable to access 'https://github.com/xinxiamu/java-core.git/': OpenSSL SS
 ```shell
 git config --global http.sslVerify "false"
 ```
+
+## git项目出现目录安全检查
+
+问题：
+
+Win10系统，使用VSCode提示错误fatal: detected dubious ownership in repository at
+
+解决：
+
+win10电脑打开`git bash`命令窗口执行：
+```shell
+git config --global --add safe.directory '*'
+```
