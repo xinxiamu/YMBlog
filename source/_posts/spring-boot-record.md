@@ -81,4 +81,68 @@ https://blog.csdn.net/zhanglu1236789/article/details/78999496
 
     spring.data.redis.repositories.enabled = false    
 
-    
+## 父类中注入泛型bean，爆错多个bean实例无法注入
+
+- 错误描述：
+
+```text
+Field dao in com.hgbio.core.base.BaseServiceImpl required a single bean, but 23 were found:
+```
+
+- 解决方法：
+
+`给其中一个实现类添加@Primary标记为默认初始化的类即可`
+
+## 重定向路径后，前端出现跨域问题
+
+- 问题描述：
+
+前后端分离的项目，前端angular，后端spring boot（单体应用）。前后端都已经做了跨域的相关配置。在后端定义了过滤器，来拦截请求检测token的时候，如果token错误，那么就重定向到一个错误的路径，此时，出现了跨域的问题。
+
+代码：
+
+```java
+ @Override
+public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+    log.info(">>>>indexFilter doFilter token");
+
+    HttpServletRequest request = (HttpServletRequest) servletRequest;
+    HttpServletResponse response = (HttpServletResponse) servletResponse;
+    String path = request.getRequestURI().substring(request.getContextPath().length()).replaceAll("[/]+$", "");
+    boolean allowedPath = ALLOWED_PATHS.contains(path);
+    if (allowedPath) { //允许直接通过网址
+        filterChain.doFilter(servletRequest, servletResponse);
+        return;
+    }
+
+    //option预检查，直接通过请求
+    if ("OPTIONS".equals(request.getMethod())) {
+        response.setStatus(HttpServletResponse.SC_OK);
+        //filterChain.doFilter(servletRequest, servletResponse);
+        return;
+    }
+
+    String token = getToken(request);
+    log.info(">>>>indexFilter doFilter token: {}", token);
+    if (StringUtil.isEmpty(token)) {
+        response.sendRedirect("/token/error");
+        //request.getRequestDispatcher("/token/error").forward(request, response);
+        return;
+    }
+
+    filterChain.doFilter(servletRequest, servletResponse);
+
+}
+```
+
+- 错误内容：
+
+前端报错：
+
+```text
+Access to XMLHttpRequest at 'http://127.0.0.1:9010/user/getUserMenus' from origin 'http://localhost:12000' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+```
+
+- 解决：
+
+之所以会出现跨域问题，是因为使用`response.sendRedirect("/token/error");`重定向，浏览器默认跳转页面，所以出现跨域问题。因此要改成：`request.getRequestDispatcher("/token/error").forward(request, response);`,该方法重定向只涉及到后端的转发，不涉及到前端，所以不会出现跨域问题。

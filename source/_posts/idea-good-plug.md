@@ -5,6 +5,26 @@ categories: idea
 tags:
 ---
 
+这里收集idea各种优秀的有助于提高开发效率的插件！！！
+
+## Alibaba Cloud AI Coding Assistant
+
+阿里云智能编码插件（Alibaba Cloud AI Coding Assistant）是一款AI编程助手
+提供代码智能补全和代码示例搜索能力，帮你更快更高效地写出高质量代码。
+
+[官网](https://developer.aliyun.com/tool/cosy)
+
+## arthas idea plugin（部分命令可视化）
+
+alibaba的java内存诊断工具arthas的idea插件。
+
+[使用文档](https://www.yuque.com/arthas-idea-plugin)
+
+## Alibaba Cloud Toolkit
+
+alibaba出品的热部署插件工具。
+
+
 ## GsonFormat
 1. 作用：json字符串自动生成javabean工具。
 2. 使用：

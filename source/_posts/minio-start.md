@@ -21,6 +21,18 @@ docker run -p 9000:9000 -p 9001:9001 \
 
 安装完毕，可以浏览器打开管理界面：http://localhost:9001
 
+_最新_:
+
+```shell
+docker run -p 9000:9000 -p 9001:9001 \
+--restart=always \
+--name minio1 \
+-v /mnt/data:/data \
+-e "MINIO_ROOT_USER=izajzo6yycy5d65vexjmdvtts" \
+-e "MINIO_ROOT_PASSWORD=kvb9fv35c14soranzsz8bwzyf" \
+-d quay.io/minio/minio server /data --console-address ":9001"
+```
+
 ## 客户端使用
 
 1.安装客户端

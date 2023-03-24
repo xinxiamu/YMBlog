@@ -199,3 +199,102 @@ tags: shadowsocks-go
     
 说明：如果只是想临时的让当前命令窗口代理，那么只需要添加临时变量，不需要编辑~/.bashrc。  
 只需要在当前命令窗口执行`export http_proxy=http://127.0.0.1:8118/` ` export https_proxy=http://127.0.0.1:8118/ `         
+
+
+## Shadowsocks-rust 搭建vpn
+
+[网址](https://github.com/shadowsocks/shadowsocks-rust)
+
+1. 服务器安装`rust`环境
+
+```shell
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh 
+source "$HOME/.cargo/env"
+rustc -V
+rustc 1.62.0 (a8314ef7d 2022-06-27)
+```
+
+会下载脚本文件并执行，安装rust。
+
+2. 安装Shadowsocks-rust服务和客户端
+
+执行命令：
+```shell
+cargo install shadowsocks-rust
+```
+
+报错：
+```shell
+error: linker `cc` not found
+  |
+  = note: No such file or directory (os error 2)
+
+error: could not compile `libc` due to previous error
+warning: build failed, waiting for other jobs to finish...
+
+```
+
+是因为linux服务器缺少c编译环境，可以执行下面命令安装：
+```shell
+sudo yum -y install gcc gcc-c++ kernel-devel
+```
+
+安装成功后，查看安装好的安装包：
+```shell
+[root@server-dev-01 .cargo]# pwd
+/root/.cargo
+[root@server-dev-01 .cargo]# ls
+bin  env  registry
+[root@server-dev-01 .cargo]# cd bin/
+[root@server-dev-01 bin]# ls
+cargo         cargo-fmt   clippy-driver  rustc    rustfmt   rust-gdbgui  rustup   ssmanager  ssservice
+cargo-clippy  cargo-miri  rls            rustdoc  rust-gdb  rust-lldb    sslocal  ssserver   ssurl
+[root@server-dev-01 bin]# 
+
+```
+
+两个服务。`ssserver`服务端。`sslocal`客户端。
+
+3. 配置，试用：
+
+新建配置文件：shadowsocks.json，编辑内容：
+```text
+{
+    "servers": [
+        {
+            "address": "192.168.0.106",
+            "port": 8388,
+            "password": "a1234567",
+            "method": "aes-256-gcm",
+            "timeout": 7200
+        },
+        {
+            "address": "192.168.0.106",
+            "port": 8389,
+            "password": "a1234567",
+            "method": "chacha20-ietf-poly1305"
+        },
+        {
+            "disabled": true,
+            "address": "eg.disable.me",
+            "port": 8390,
+            "password": "hello-internet",
+            "method": "chacha20-ietf-poly1305"
+        }
+    ],
+    // ONLY FOR `sslocal`
+    // Delete these lines if you are running `ssserver` or `ssmanager`
+    "local_port": 1080,
+    "local_address": "127.0.0.1"
+}
+
+```
+
+可以配置多个服务实例。不同的端口运行不同的实例。同一个进程。客户端连的时候，会选择延迟最小，高可用的连接。
+
+后台启动服务：
+```shell
+ssserver -c shadowsocks.json -d 
+```
+
+客户端连接vpn服务，可以用sslocal客户端，也可以用其它的vpn客户端，比如各个平台的vpn界面服务端。
