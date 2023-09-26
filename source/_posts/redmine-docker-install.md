@@ -24,32 +24,43 @@ docker run -d --name xc-redmine -p 8888:3000 --restart always -v /server/redmine
 
 ```shell script
 version: '2.0'
- 
+
 services:
- 
   redmine:
     image: redmine
     restart: always
     ports:
       - 3000:3000
     environment:
+      REDMINE_DEFAULT_LANGUAGE: zh
       REDMINE_DB_MYSQL: db
       REDMINE_DB_PASSWORD: root123
     volumes:
       - ./redmine/data:/usr/src/redmine/files:z
       - ./redmine/plugins:/usr/src/redmine/plugins:z
- 
   db:
     image: mysql:5.7
     restart: always
     volumes:
-      - ./mysql/data:/var/lib/mysql:z      
+      - ./mysql/data:/var/lib/mysql:z
     environment:
       MYSQL_ROOT_PASSWORD: root123
       MYSQL_DATABASE: redmine
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATE: utf8mb4_unicode_ci
     ports:
       - 3306:3306
+
 ```
+
+安装后问题：
+
+新建项目等无法插入中文字符。是因为默认创建的数据库字符集不对。
+
+解决办法：
+
+用数据库客户端连接到数据库服务器，删除redmine数据库，重新创建数据库redmine并选择字符集`utf8mb4  utf8mb4_unicode_ci。
+然后重新启动。
 
 ## 迁移redmine系统数据
 

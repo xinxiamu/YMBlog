@@ -81,3 +81,93 @@ tags:
     删除上面的规则
     
     $ sudo ufw delete allow from 192.168.254.254
+
+## Ubuntu Server更改系统时间
+
+本地小型机，更改系统时间，尽可能在外有外网情况下确保时间准确。
+
+1. 查看系统时间时区是否正确。
+
+```shell
+root@hgbio-server:~# hwclock 
+2023-07-12 08:17:30.356828+00:00
+```
+
+查看是否是+08：00，即东八区。上面命令结果明显不是。
+
+所以下面使用`tzselect`修改时区。
+
+```shell
+root@hgbio-server:~# tzselect 
+Please identify a location so that time zone rules can be set correctly.
+Please select a continent, ocean, "coord", or "TZ".
+1) Africa							     7) Europe
+2) Americas							     8) Indian Ocean
+3) Antarctica							     9) Pacific Ocean
+4) Asia								    10) coord - I want to use geographical coordinates.
+5) Atlantic Ocean						    11) TZ - I want to specify the timezone using the Posix TZ format.
+6) Australia
+#? ^[[B^H4
+Please enter a number in range.
+#? 4
+Please select a country whose clocks agree with yours.
+1) Afghanistan		      9) Cambodia		  17) Hong Kong		       25) Kazakhstan		    33) Malaysia		 41) Qatar		      49) Taiwan
+2) Antarctica		     10) China			  18) India		       26) Korea (North)	    34) Mongolia		 42) Réunion		      50) Tajikistan
+3) Armenia		     11) Christmas Island	  19) Indonesia		       27) Korea (South)	    35) Myanmar (Burma)		 43) Russia		      51) Thailand
+4) Azerbaijan		     12) Cocos (Keeling) Islands  20) Iran		       28) Kuwait		    36) Nepal			 44) Saudi Arabia	      52) Turkmenistan
+5) Bahrain		     13) Cyprus			  21) Iraq		       29) Kyrgyzstan		    37) Oman			 45) Seychelles		      53) United Arab Emirates
+6) Bangladesh		     14) East Timor		  22) Israel		       30) Laos			    38) Pakistan		 46) Singapore		      54) Uzbekistan
+7) Bhutan		     15) French S. Terr.	  23) Japan		       31) Lebanon		    39) Palestine		 47) Sri Lanka		      55) Vietnam
+8) Brunei		     16) Georgia		  24) Jordan		       32) Macau		    40) Philippines		 48) Syria		      56) Yemen
+#? 10
+Please select one of the following timezones.
+1) Beijing Time
+2) Xinjiang Time, Vostok
+#? 1
+
+The following information has been given:
+
+	China
+	Beijing Time
+
+Therefore TZ='Asia/Shanghai' will be used.
+Selected time is now:	Wed Jul 12 16:18:37 CST 2023.
+Universal Time is now:	Wed Jul 12 08:18:37 UTC 2023.
+Is the above information OK?
+1) Yes
+2) No
+#? 1
+
+You can make this change permanent for yourself by appending the line
+	TZ='Asia/Shanghai'; export TZ
+to the file '.profile' in your home directory; then log out and log in again.
+
+Here is that TZ value again, this time on standard output so that you
+can use the /usr/bin/tzselect command in shell scripts:
+Asia/Shanghai
+root@hgbio-server:~# cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime 
+root@hgbio-server:~# date
+Wed Jul 12 04:27:33 PM CST 2023
+```
+
+在联网情况下，会自动更新系统时间。否则可以手动设置时间。`date -s`命令。
+
+2. 使用以下命令重新配置时区：
+
+```shell
+sudo dpkg-reconfigure -f noninteractive tzdata
+```
+
+3. 把当前准确系统时间写入硬件电子钟。
+
+```shell
+sudo hwclock -w
+```
+
+4. 格式化查看当前系统时间
+
+```shell
+root@hgbio-server:~# date +"%Y-%m-%d %H:%M:%S"
+2023-07-12 16:29:57
+```
+

@@ -134,7 +134,7 @@ tags: shadowsocks-go
 
 - 安卓客户端：
 
-下载：{%asset_link Shadowsocks_v4.2.5_apkpure.com.apk Shadowsocks_v4.2.5_apkpure.com.apk%}
+下载：{%asset_link shadowsocks-universal-5.3.3.apk shadowsocks-universal-5.3.3.apk%}
 
 - 苹果客户端：
 
@@ -296,5 +296,8 @@ cargo-clippy  cargo-miri  rls            rustdoc  rust-gdb  rust-lldb    sslocal
 ```shell
 ssserver -c shadowsocks.json -d 
 ```
+
+后台centos7服务端二进制编译包：{%asset_link ssserver-centos7 ssserver-centos7%}
+
 
 客户端连接vpn服务，可以用sslocal客户端，也可以用其它的vpn客户端，比如各个平台的vpn界面服务端。
